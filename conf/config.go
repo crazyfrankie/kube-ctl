@@ -14,10 +14,16 @@ var (
 )
 
 type Config struct {
+	Server Server `yaml:"server"`
+	MySQL  MySQL  `yaml:"mysql"`
 }
 
 type Server struct {
-	Addr string
+	Addr string `yaml:"addr"`
+}
+
+type MySQL struct {
+	DSN string `yaml:"dsn"`
 }
 
 func GetConf() *Config {
