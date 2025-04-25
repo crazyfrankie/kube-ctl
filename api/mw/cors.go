@@ -1,4 +1,4 @@
-package mws
+package mw
 
 import (
 	"time"
@@ -11,9 +11,9 @@ func CORS() gin.HandlerFunc {
 	return cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:9528"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization", "x-token"},
 		ExposeHeaders:    []string{"Content-Length", "Cookie"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
+		MaxAge:           24 * time.Hour,
 	})
 }

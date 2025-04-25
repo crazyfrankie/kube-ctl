@@ -4,7 +4,7 @@ package ioc
 
 import (
 	"github.com/crazyfrankie/kube-ctl/api/k8s"
-	"github.com/crazyfrankie/kube-ctl/api/mws"
+	"github.com/crazyfrankie/kube-ctl/api/mw"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	"k8s.io/client-go/kubernetes"
@@ -30,7 +30,7 @@ func InitKubernetes() *kubernetes.Clientset {
 
 func InitMws() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
-		mws.CORS(),
+		mw.CORS(),
 	}
 }
 

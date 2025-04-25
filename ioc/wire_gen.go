@@ -8,7 +8,7 @@ package ioc
 
 import (
 	"github.com/crazyfrankie/kube-ctl/api/k8s"
-	"github.com/crazyfrankie/kube-ctl/api/mws"
+	"github.com/crazyfrankie/kube-ctl/api/mw"
 	"github.com/gin-gonic/gin"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -43,12 +43,12 @@ func InitKubernetes() *kubernetes.Clientset {
 }
 
 func InitMws() []gin.HandlerFunc {
-	return []gin.HandlerFunc{mws.CORS()}
+	return []gin.HandlerFunc{mw.CORS()}
 }
 
-func InitGin(pod *k8s.PodHandler, mws2 []gin.HandlerFunc) *gin.Engine {
+func InitGin(pod *k8s.PodHandler, mws []gin.HandlerFunc) *gin.Engine {
 	srv := gin.Default()
-	srv.Use(mws2...)
+	srv.Use(mws...)
 	pod.RegisterRoute(srv)
 
 	return srv
