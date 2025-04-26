@@ -12,7 +12,7 @@ type PodValidate struct {
 }
 
 func (p *PodValidate) Validate(pod *req.Pod) error {
-	// Checksum required
+	// Check sum required
 	if pod.Base.Name == "" {
 		return errors.New("pod name is necessary")
 	}

@@ -20,10 +20,17 @@ func Success(c *gin.Context) {
 	})
 }
 
-func SuccessWithData(c *gin.Context, msg string, data any) {
+func SuccessWithMsg(c *gin.Context, msg string) {
 	c.JSON(http.StatusOK, Response{
 		Code: 20000,
 		Msg:  msg,
+	})
+}
+
+func SuccessWithData(c *gin.Context, data any) {
+	c.JSON(http.StatusOK, Response{
+		Code: 20000,
+		Msg:  "OK",
 		Data: data,
 	})
 }
