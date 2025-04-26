@@ -2,7 +2,7 @@ package k8s
 
 import (
 	"context"
-	errors2 "errors"
+	es "errors"
 	"fmt"
 
 	"github.com/crazyfrankie/gem/gerrors"
@@ -12,7 +12,7 @@ import (
 	"k8s.io/client-go/kubernetes"
 
 	"github.com/crazyfrankie/kube-ctl/api/model/req"
-	"github.com/crazyfrankie/kube-ctl/api/model/res"
+	"github.com/crazyfrankie/kube-ctl/api/model/resp"
 	"github.com/crazyfrankie/kube-ctl/pkg/convert"
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
 	"github.com/crazyfrankie/kube-ctl/pkg/validate"
@@ -43,16 +43,16 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 			return
 		}
 
-		ns := make([]res.Namespace, 0, len(list.Items))
+		ns := make([]resp.Namespace, 0, len(list.Items))
 		for _, i := range list.Items {
-			ns = append(ns, res.Namespace{
+			ns = append(ns, resp.Namespace{
 				Name:       i.Name,
 				CreateTime: i.CreationTimestamp.Unix(),
 				Status:     string(i.Status.Phase),
 			})
 		}
 
-		response.SuccessWithData(c, ns)
+		response.SuccessWithData(c, "OK", ns)
 	}
 }
 
@@ -74,26 +74,24 @@ func (p *PodHandler) CreatePod() gin.HandlerFunc {
 		pd, err := p.clientSet.CoreV1().Pods(pod.Base.Namespace).Create(c.Request.Context(),
 			convert.PodReqConvert(&pod), metav1.CreateOptions{})
 		if err != nil {
-			msg := errors2.New(fmt.Sprintf("failed create pod, name: %s, %s", pod.Base.Name, err.Error()))
+			msg := es.New(fmt.Sprintf("failed create pod, name: %s, %s", pod.Base.Name, err.Error()))
 			response.Error(c, msg)
 			return
 		}
 
-		response.SuccessWithData(c, pd)
+		response.SuccessWithData(c, fmt.Sprintf("Pod[%s-%s] created success", pod.Base.Name, pod.Base.Name), pd)
 	}
 }
 
 func (p *PodHandler) GetPodList() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		pods, err := p.clientSet.CoreV1().Pods("").List(c.Request.Context(), metav1.ListOptions{})
+		ns := c.Query("namespace")
+
+		pods, err := p.clientSet.CoreV1().Pods(ns).List(c.Request.Context(), metav1.ListOptions{})
 		if err != nil {
 			panic(err.Error())
 		}
 		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
-
-		for _, p := range pods.Items {
-			fmt.Println(p.Name)
-		}
 
 		// Examples for error handling:
 		// - Use helper functions like e.g. errors.IsNotFound()
@@ -112,6 +110,6 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 			fmt.Printf("Found pod %s in namespace %s\n", pod, namespace)
 		}
 
-		response.SuccessWithData(c, pods.Items)
+		response.SuccessWithData(c, "OK", pods.Items)
 	}
 }
