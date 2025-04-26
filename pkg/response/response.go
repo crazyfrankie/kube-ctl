@@ -36,4 +36,10 @@ func Error(c *gin.Context, err error) {
 			Data: nil,
 		})
 	}
+
+	c.JSON(http.StatusOK, Response{
+		Code: 50000,
+		Msg:  err.Error(),
+		Data: nil,
+	})
 }
