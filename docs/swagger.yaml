@@ -1,0 +1,385 @@
+definitions:
+  req.Base:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      restartPolicy:
+        description: 'reboot strategy: Always | Never | On-Failure'
+        type: string
+    type: object
+  req.Container:
+    properties:
+      args:
+        items:
+          type: string
+        type: array
+      command:
+        items:
+          type: string
+        type: array
+      env:
+        items:
+          $ref: '#/definitions/req.Item'
+        type: array
+      image:
+        type: string
+      imagePullPolicy:
+        description: Always | IfNotPresent | Never
+        type: string
+      livenessProbe:
+        allOf:
+        - $ref: '#/definitions/req.ContainerProbe'
+        description: Survival probes
+      name:
+        type: string
+      ports:
+        items:
+          $ref: '#/definitions/req.ContainerPort'
+        type: array
+      privileged:
+        description: Whether to enable privileged mode (e.g. root)
+        type: boolean
+      readyProbe:
+        allOf:
+        - $ref: '#/definitions/req.ContainerProbe'
+        description: Readiness Probe
+      resources:
+        allOf:
+        - $ref: '#/definitions/req.Resource'
+        description: Container application quota
+      startUpProbe:
+        allOf:
+        - $ref: '#/definitions/req.ContainerProbe'
+        description: Start the probe
+      tty:
+        type: boolean
+      volumeMounts:
+        description: Mounted volumes
+        items:
+          $ref: '#/definitions/req.VolumeMount'
+        type: array
+      workingDir:
+        type: string
+    type: object
+  req.ContainerPort:
+    properties:
+      containerPort:
+        type: integer
+      hostPort:
+        type: integer
+      name:
+        type: string
+    type: object
+  req.ContainerProbe:
+    properties:
+      command:
+        $ref: '#/definitions/req.ProbeCommand'
+      enable:
+        description: Whether to turn on the probe
+        type: boolean
+      failureThreshold:
+        description: Threshold number of probes to consider a probe failure
+        type: integer
+      httpGet:
+        $ref: '#/definitions/req.ProbeHTTPGet'
+      initialDelaySeconds:
+        description: Initialize for a number of seconds before starting the probe
+        type: integer
+      periodSeconds:
+        description: Probe after every few seconds
+        type: integer
+      successThreshold:
+        description: Threshold number of probes to consider a probe successful
+        type: integer
+      tcpSocket:
+        $ref: '#/definitions/req.ProbeTcpSocket'
+      timeoutSeconds:
+        description: Probe timeout time
+        type: integer
+      type:
+        description: 'Probe type: tcp | http | command'
+        type: string
+    type: object
+  req.DnsConfig:
+    properties:
+      nameservers:
+        items:
+          type: string
+        type: array
+    type: object
+  req.Item:
+    properties:
+      key:
+        type: string
+      value:
+        type: string
+    type: object
+  req.Network:
+    properties:
+      dnsConfig:
+        $ref: '#/definitions/req.DnsConfig'
+      dnsPolicy:
+        type: string
+      hostAliases:
+        items:
+          $ref: '#/definitions/req.Item'
+        type: array
+      hostName:
+        type: string
+      hostNetwork:
+        type: boolean
+    type: object
+  req.Pod:
+    properties:
+      base:
+        allOf:
+        - $ref: '#/definitions/req.Base'
+        description: base definition info
+      containers:
+        items:
+          $ref: '#/definitions/req.Container'
+        type: array
+      initContainers:
+        items:
+          $ref: '#/definitions/req.Container'
+        type: array
+      network:
+        $ref: '#/definitions/req.Network'
+      volume:
+        items:
+          $ref: '#/definitions/req.Volume'
+        type: array
+    type: object
+  req.ProbeCommand:
+    properties:
+      command:
+        description: cat /test/test.txt
+        items:
+          type: string
+        type: array
+    type: object
+  req.ProbeHTTPGet:
+    properties:
+      headers:
+        description: http headers
+        items:
+          $ref: '#/definitions/req.Item'
+        type: array
+      host:
+        description: If "", it's an in-pod request.
+        type: string
+      path:
+        type: string
+      port:
+        type: integer
+      scheme:
+        description: http | https
+        type: string
+    type: object
+  req.ProbeTcpSocket:
+    properties:
+      host:
+        type: string
+      port:
+        type: integer
+    type: object
+  req.Resource:
+    properties:
+      CPULimit:
+        type: integer
+      CPUReq:
+        description: cpu m
+        type: integer
+      enable:
+        description: Whether to configure container quotas
+        type: boolean
+      memory:
+        description: memory mi
+        type: integer
+      memoryLimit:
+        type: integer
+    type: object
+  req.Volume:
+    properties:
+      name:
+        type: string
+      type:
+        type: string
+    type: object
+  req.VolumeMount:
+    properties:
+      mountName:
+        type: string
+      mountPath:
+        description: Mounted volume -> path in the corresponding container
+        type: string
+      readOnly:
+        description: Read-only or not
+        type: boolean
+    type: object
+  resp.Namespace:
+    properties:
+      createTime:
+        type: integer
+      name:
+        type: string
+      status:
+        type: string
+    type: object
+  resp.PodListItem:
+    properties:
+      age:
+        description: Runtime
+        type: integer
+      ip:
+        description: Pod id
+        type: string
+      name:
+        type: string
+      node:
+        description: Which Node the Pod is dispatched to
+        type: string
+      ready:
+        description: 0/1 | 1/1
+        type: string
+      restarts:
+        description: Number of restarts
+        type: integer
+      status:
+        description: Running | Error
+        type: string
+    type: object
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/pod:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定命名空间下的指定Pod
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Pod名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 删除Pod
+      tags:
+      - Pod管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的Pod或更新已存在的Pod
+      parameters:
+      - description: Pod配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/req.Pod'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 参数错误(code=20001)或验证错误(code=20002)或系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 创建或更新Pod
+      tags:
+      - Pod管理
+  /api/pod/detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Pod的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Pod名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取Pod详情
+      tags:
+      - Pod管理
+  /api/pod/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下的所有Pod列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: 获取Pod列表
+      tags:
+      - Pod管理
+  /api/pod/namespace:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有可用的命名空间列表
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回命名空间列表，每个命名空间包含名称、创建时间和状态
+          schema:
+            allOf:
+            - $ref: '#/definitions/response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/resp.Namespace'
+                  type: array
+              type: object
+      summary: 获取命名空间列表
+      tags:
+      - Pod管理
+swagger: "2.0"
