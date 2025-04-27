@@ -47,6 +47,7 @@ func Error(c *gin.Context, err error) {
 			Msg:  bizErr.BizMessage(),
 			Data: nil,
 		})
+		return
 	}
 
 	c.JSON(http.StatusOK, Response{
