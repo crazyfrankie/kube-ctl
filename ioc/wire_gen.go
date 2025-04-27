@@ -9,6 +9,7 @@ package ioc
 import (
 	"github.com/crazyfrankie/kube-ctl/api/k8s"
 	"github.com/crazyfrankie/kube-ctl/api/mw"
+	"github.com/crazyfrankie/kube-ctl/service"
 	"github.com/gin-gonic/gin"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -18,7 +19,8 @@ import (
 
 func InitServer() *gin.Engine {
 	clientset := InitKubernetes()
-	podHandler := k8s.NewPodHandler(clientset)
+	podService := service.NewPodService(clientset)
+	podHandler := k8s.NewPodHandler(podService)
 	v := InitMws()
 	engine := InitGin(podHandler, v)
 	return engine

@@ -2,6 +2,7 @@ package convert
 
 import (
 	"fmt"
+	"github.com/crazyfrankie/kube-ctl/api/model/resp"
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ const (
 	EMPTYDIR = "emptyDir"
 )
 
+// PodReqConvert convert req.Pod to corev1.Pod
 func PodReqConvert(req *req.Pod) *corev1.Pod {
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
@@ -44,7 +46,6 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 	}
 }
 
-// getPodLabels converts the labels in the request to labels of type map[string]string as needed by client-go.
 func getPodLabels(items []req.Item) map[string]string {
 	res := make(map[string]string, len(items))
 	for _, i := range items {
@@ -212,4 +213,257 @@ func getPodHostAliases(as []req.Item) []corev1.HostAlias {
 	}
 
 	return res
+}
+
+// PodConvertReq corev1.Pod convert to req.Pod
+func PodConvertReq(pod *corev1.Pod) *req.Pod {
+	return &req.Pod{
+		Base:           getReqBase(pod),
+		Network:        getReqNetwork(pod),
+		Volume:         getReqVolume(pod.Spec.Volumes),
+		InitContainers: getReqContainers(pod.Spec.InitContainers),
+		Containers:     getReqContainers(pod.Spec.Containers),
+	}
+}
+
+func getReqBase(pod *corev1.Pod) req.Base {
+	return req.Base{
+		Name:          pod.Name,
+		Labels:        getReqLabels(pod.Labels),
+		Namespace:     pod.Namespace,
+		RestartPolicy: string(pod.Spec.RestartPolicy),
+	}
+}
+
+func getReqLabels(data map[string]string) []req.Item {
+	res := make([]req.Item, 0, len(data))
+	for k, v := range data {
+		res = append(res, req.Item{
+			Key:   k,
+			Value: v,
+		})
+	}
+
+	return res
+}
+
+func getReqNetwork(pod *corev1.Pod) req.Network {
+	return req.Network{
+		HostNetwork: pod.Spec.HostNetwork,
+		HostName:    pod.Spec.NodeName,
+		DnsPolicy:   string(pod.Spec.DNSPolicy),
+		DnsConfig:   getReqDNSConfig(pod.Spec.DNSConfig),
+		HostAliases: getReqHostAliases(pod.Spec.HostAliases),
+	}
+}
+
+func getReqDNSConfig(dns *corev1.PodDNSConfig) req.DnsConfig {
+	if dns == nil {
+		return req.DnsConfig{}
+	} else {
+		return req.DnsConfig{Nameservers: dns.Nameservers}
+	}
+}
+
+func getReqHostAliases(host []corev1.HostAlias) []req.Item {
+	res := make([]req.Item, 0, len(host))
+	for _, i := range host {
+		res = append(res, req.Item{
+			Key:   i.IP,
+			Value: strings.Join(i.Hostnames, ","),
+		})
+	}
+
+	return res
+}
+
+func getReqVolume(volumes []corev1.Volume) []req.Volume {
+	res := make([]req.Volume, 0, len(volumes))
+	for _, v := range volumes {
+		if v.EmptyDir == nil {
+			continue
+		}
+		res = append(res, req.Volume{
+			Name: v.Name,
+			Type: EMPTYDIR,
+		})
+	}
+
+	return res
+}
+
+func getReqContainers(containers []corev1.Container) []req.Container {
+	res := make([]req.Container, 0, len(containers))
+	for _, c := range containers {
+		res = append(res, req.Container{
+			Name:            c.Name,
+			Image:           c.Image,
+			ImagePullPolicy: string(c.ImagePullPolicy),
+			Tty:             c.TTY,
+			Ports:           getReqContainerPort(c.Ports),
+			WorkingDir:      c.WorkingDir,
+			Command:         c.Command,
+			Args:            c.Args,
+			Env:             getReqContainerEnv(c.Env),
+			Privileged:      *c.SecurityContext.Privileged,
+			Resources:       getReqContainerResource(&c.Resources),
+			VolumeMounts:    getReqContainerVolumeMount(c.VolumeMounts),
+			StartUpProbe:    getReqContainerProbe(c.StartupProbe),
+			LivenessProbe:   getReqContainerProbe(c.LivenessProbe),
+			ReadinessProbe:  getReqContainerProbe(c.ReadinessProbe),
+		})
+	}
+
+	return res
+}
+
+func getReqContainerPort(ports []corev1.ContainerPort) []req.ContainerPort {
+	res := make([]req.ContainerPort, 0, len(ports))
+	for _, i := range ports {
+		res = append(res, req.ContainerPort{
+			Name:          i.Name,
+			ContainerPort: i.ContainerPort,
+			HostPort:      i.HostPort,
+		})
+	}
+
+	return res
+}
+
+func getReqContainerEnv(envs []corev1.EnvVar) []req.Item {
+	res := make([]req.Item, 0, len(envs))
+	for _, i := range envs {
+		res = append(res, req.Item{
+			Key:   i.Name,
+			Value: i.Value,
+		})
+	}
+
+	return res
+}
+
+func getReqContainerResource(resource *corev1.ResourceRequirements) req.Resource {
+	if resource == nil {
+		return req.Resource{}
+	}
+
+	return req.Resource{
+		Enable:      true,
+		MemoryReq:   int32(resource.Requests.Memory().Value()),
+		MemoryLimit: int32(resource.Limits.Memory().Value()),
+		CPUReq:      int32(resource.Requests.Cpu().Value()),
+		CPULimit:    int32(resource.Limits.Cpu().Value()),
+	}
+}
+
+func getReqContainerVolumeMount(vm []corev1.VolumeMount) []req.VolumeMount {
+	res := make([]req.VolumeMount, 0, len(vm))
+	for _, i := range vm {
+		res = append(res, req.VolumeMount{
+			MountName: i.Name,
+			MountPath: i.MountPath,
+			ReadOnly:  i.ReadOnly,
+		})
+	}
+
+	return res
+}
+
+func getReqContainerProbe(probe *corev1.Probe) req.ContainerProbe {
+	if probe != nil {
+		if probe.HTTPGet != nil {
+			return req.ContainerProbe{
+				Enable: true,
+				Type:   HTTPProbe,
+				HttpGet: req.ProbeHTTPGet{
+					Scheme:  string(probe.HTTPGet.Scheme),
+					Host:    probe.HTTPGet.Host,
+					Path:    probe.HTTPGet.Path,
+					Port:    probe.HTTPGet.Port.IntVal,
+					Headers: getReqProbeHTTPHeaders(probe.HTTPGet.HTTPHeaders),
+				},
+				ProbeTime: req.ProbeTime{
+					InitialDelaySeconds: probe.InitialDelaySeconds,
+					PeriodSeconds:       probe.PeriodSeconds,
+					TimeoutSeconds:      probe.TimeoutSeconds,
+					SuccessThreshold:    probe.SuccessThreshold,
+					FailureThreshold:    probe.FailureThreshold,
+				},
+			}
+		}
+		if probe.TCPSocket != nil {
+			return req.ContainerProbe{
+				Enable: true,
+				Type:   TCPProbe,
+				TcpSocket: req.ProbeTcpSocket{
+					Host: probe.TCPSocket.Host,
+					Port: probe.TCPSocket.Port.IntVal,
+				},
+				ProbeTime: req.ProbeTime{
+					InitialDelaySeconds: probe.InitialDelaySeconds,
+					PeriodSeconds:       probe.PeriodSeconds,
+					TimeoutSeconds:      probe.TimeoutSeconds,
+					SuccessThreshold:    probe.SuccessThreshold,
+					FailureThreshold:    probe.FailureThreshold,
+				},
+			}
+		}
+		if probe.Exec != nil {
+			return req.ContainerProbe{
+				Enable:  true,
+				Type:    EXECProbe,
+				Command: req.ProbeCommand{Command: probe.Exec.Command},
+				ProbeTime: req.ProbeTime{
+					InitialDelaySeconds: probe.InitialDelaySeconds,
+					PeriodSeconds:       probe.PeriodSeconds,
+					TimeoutSeconds:      probe.TimeoutSeconds,
+					SuccessThreshold:    probe.SuccessThreshold,
+					FailureThreshold:    probe.FailureThreshold,
+				},
+			}
+		}
+	}
+
+	return req.ContainerProbe{}
+}
+
+func getReqProbeHTTPHeaders(header []corev1.HTTPHeader) []req.Item {
+	res := make([]req.Item, 0, len(header))
+	for _, i := range header {
+		res = append(res, req.Item{
+			Key:   i.Name,
+			Value: i.Value,
+		})
+	}
+
+	return res
+}
+
+func PodListConvertResp(pod corev1.Pod) resp.PodListItem {
+	var total, ready int
+	var restart int32
+	for _, c := range pod.Status.ContainerStatuses {
+		if c.Ready {
+			ready++
+		}
+		restart += c.RestartCount
+		total++
+	}
+
+	var podStatus string
+	if pod.Status.Phase != "Running" {
+		podStatus = "Error"
+	} else {
+		podStatus = "Running"
+	}
+
+	return resp.PodListItem{
+		Name:     pod.Name,
+		Ready:    fmt.Sprintf("%d/%d", ready, total),
+		Status:   podStatus,
+		Restarts: restart,
+		Age:      pod.CreationTimestamp.Unix(),
+		IP:       pod.Status.PodIP,
+		Node:     pod.Spec.NodeName,
+	}
 }

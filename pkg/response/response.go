@@ -7,6 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Response Code Design
+// 1. Harmonize five digits
+// 2. 2xxxx for parameter errors, special 20000 for successful operations
+// 3. 3xxxx indicates a resource class error.
+// 4. 5xxxx indicates a system error.
 type Response struct {
 	Code int32  `json:"code"`
 	Msg  string `json:"msg"`
