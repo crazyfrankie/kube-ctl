@@ -6,6 +6,8 @@ import (
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 
 	"github.com/crazyfrankie/kube-ctl/api/model/req"
 	"github.com/crazyfrankie/kube-ctl/api/model/resp"
@@ -13,6 +15,7 @@ import (
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
 	"github.com/crazyfrankie/kube-ctl/pkg/validate"
 	"github.com/crazyfrankie/kube-ctl/service"
+	"github.com/crazyfrankie/kube-ctl/docs"
 )
 
 type PodHandler struct {
@@ -34,6 +37,14 @@ func (p *PodHandler) RegisterRoute(r *gin.Engine) {
 	}
 }
 
+// @Summary Get all namespaces
+// @Description Get list of all Kubernetes namespaces
+// @Tags namespace
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response{data=[]resp.Namespace} "Success"
+// @Failure 400 {object} response.Response "Error"
+// @Router /pod/namespace [get]
 func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		items, err := p.svc.GetNamespace(context.Background())

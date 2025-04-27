@@ -9,8 +9,11 @@ package ioc
 import (
 	"github.com/crazyfrankie/kube-ctl/api/k8s"
 	"github.com/crazyfrankie/kube-ctl/api/mw"
+	"github.com/crazyfrankie/kube-ctl/docs"
 	"github.com/crazyfrankie/kube-ctl/service"
 	"github.com/gin-gonic/gin"
+	"github.com/swaggo/files"
+	"github.com/swaggo/gin-swagger"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
 )
@@ -52,6 +55,10 @@ func InitGin(pod *k8s.PodHandler, mws []gin.HandlerFunc) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 	pod.RegisterRoute(srv)
+
+	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	docs.SwaggerInfo.
+		BasePath = "/api"
 
 	return srv
 }
