@@ -418,4 +418,39 @@ paths:
       summary: 获取命名空间列表
       tags:
       - Pod管理
+  /api/pod/search:
+    post:
+      consumes:
+      - application/json
+      description: 搜索指定命名空间下的指定Pod
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Pod名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 搜索成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 搜索Pod
+      tags:
+      - Pod管理
 swagger: "2.0"

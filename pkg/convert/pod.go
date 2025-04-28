@@ -298,6 +298,10 @@ func getReqVolume(volumes []corev1.Volume) ([]req.Volume, map[string]string) {
 func getReqContainers(containers []corev1.Container, volumeMap map[string]string) []req.Container {
 	res := make([]req.Container, 0, len(containers))
 	for _, c := range containers {
+		var privileged bool
+		if c.SecurityContext != nil && c.SecurityContext.Privileged != nil {
+			privileged = *c.SecurityContext.Privileged
+		}
 		res = append(res, req.Container{
 			Name:            c.Name,
 			Image:           c.Image,
@@ -308,7 +312,7 @@ func getReqContainers(containers []corev1.Container, volumeMap map[string]string
 			Command:         c.Command,
 			Args:            c.Args,
 			Env:             getReqContainerEnv(c.Env),
-			Privileged:      *c.SecurityContext.Privileged,
+			Privileged:      privileged,
 			Resources:       getReqContainerResource(&c.Resources),
 			VolumeMounts:    getReqContainerVolumeMount(c.VolumeMounts, volumeMap),
 			StartUpProbe:    getReqContainerProbe(c.StartupProbe),

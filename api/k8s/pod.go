@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"net/http"
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
@@ -27,6 +28,7 @@ func (p *PodHandler) RegisterRoute(r *gin.Engine) {
 	podGroup := r.Group("api/pod")
 	{
 		podGroup.POST("", p.CreateOrUpdatePod())
+		podGroup.POST("search", p.SearchPod())
 		podGroup.GET("namespace", p.GetNameSpace())
 		podGroup.GET("detail", p.GetPod())
 		podGroup.GET("list", p.GetPodList())
@@ -47,7 +49,7 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		items, err := p.svc.GetNamespace(context.Background())
 		if err != nil {
-			response.Error(c, gerrors.NewBizError(30000, err.Error()))
+			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
 
@@ -78,15 +80,15 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var reqPod req.Pod
-		if err := c.Bind(&reqPod); err != nil {
-			response.Error(c, gerrors.NewBizError(20001, "bind error "+err.Error()))
+		if err := c.ShouldBind(&reqPod); err != nil {
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20001, "bind error "+err.Error()))
 			return
 		}
 
 		vd := &validate.PodValidate{}
 		err := vd.Validate(&reqPod)
 		if err != nil {
-			response.Error(c, gerrors.NewBizError(20002, "validate pod err: "+err.Error()))
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20002, "validate pod err: "+err.Error()))
 			return
 		}
 
@@ -94,7 +96,7 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 
 		err = p.svc.CreateOrUpdatePod(context.Background(), pod)
 		if err != nil {
-			response.Error(c, gerrors.NewBizError(30000, err.Error()))
+			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
 
@@ -120,7 +122,7 @@ func (p *PodHandler) GetPod() gin.HandlerFunc {
 
 		detail, err := p.svc.GetPod(context.Background(), namespace, name)
 		if err != nil {
-			response.Error(c, err)
+			response.Error(c, http.StatusInternalServerError, err)
 			return
 		}
 
@@ -146,7 +148,7 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 
 		items, err := p.svc.GetPodList(context.Background(), namespace)
 		if err != nil {
-			response.Error(c, gerrors.NewBizError(30000, err.Error()))
+			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
 
@@ -177,10 +179,38 @@ func (p *PodHandler) DeletePod() gin.HandlerFunc {
 
 		err := p.svc.DeletePod(context.Background(), namespace, name)
 		if err != nil {
-			response.Error(c, gerrors.NewBizError(30000, err.Error()))
+			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
 
 		response.Success(c)
+	}
+}
+
+// SearchPod
+// @Summary 搜索Pod
+// @Description 搜索指定命名空间下的指定Pod
+// @Tags Pod管理
+// @Accept json
+// @Produce json
+// @Param namespace query string true "命名空间"
+// @Param name query string true "Pod名称"
+// @Success 200 {object} response.Response{data=resp.PodListItem} "搜索成功"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
+// @Router /api/pod/search [post]
+func (p *PodHandler) SearchPod() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		namespace := c.Query("namespace")
+		name := c.Query("name")
+
+		res, err := p.svc.SearchPod(context.Background(), namespace, name)
+		if err != nil {
+			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
+			return
+		}
+
+		pod := convert.PodListConvertResp(*res)
+
+		response.SuccessWithData(c, pod)
 	}
 }

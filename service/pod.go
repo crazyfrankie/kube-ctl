@@ -18,6 +18,7 @@ type PodService interface {
 	GetPodList(ctx context.Context, namespace string) ([]corev1.Pod, error)
 	DeletePod(ctx context.Context, namespace string, name string) error
 	GetNamespace(ctx context.Context) ([]corev1.Namespace, error)
+	SearchPod(ctx context.Context, namespace string, name string) (*corev1.Pod, error)
 }
 
 type podService struct {
@@ -139,4 +140,13 @@ func (s *podService) GetNamespace(ctx context.Context) ([]corev1.Namespace, erro
 	}
 
 	return list.Items, nil
+}
+
+func (s *podService) SearchPod(ctx context.Context, namespace string, name string) (*corev1.Pod, error) {
+	pod, err := s.clientSet.CoreV1().Pods(namespace).Get(ctx, name, metav1.GetOptions{})
+	if err != nil {
+		return pod, err
+	}
+
+	return pod, nil
 }

@@ -40,9 +40,9 @@ func SuccessWithData(c *gin.Context, data any) {
 	})
 }
 
-func Error(c *gin.Context, err error) {
+func Error(c *gin.Context, code int, err error) {
 	if bizErr, ok := gerrors.FromBizStatusError(err); ok {
-		c.JSON(http.StatusOK, Response{
+		c.JSON(code, Response{
 			Code: bizErr.BizStatusCode(),
 			Msg:  bizErr.BizMessage(),
 			Data: nil,
@@ -50,7 +50,7 @@ func Error(c *gin.Context, err error) {
 		return
 	}
 
-	c.JSON(http.StatusOK, Response{
+	c.JSON(code, Response{
 		Code: 50000,
 		Msg:  err.Error(),
 		Data: nil,
