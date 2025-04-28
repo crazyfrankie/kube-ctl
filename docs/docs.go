@@ -35,15 +35,27 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/req.Pod"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "参数错误(code=20001)或验证错误(code=20002)或系统错误(code=30000)",
+                        "description": "操作成功，返回成功消息",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20001)或验证错误(code=20002)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     }
                 }
@@ -78,9 +90,15 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
+                        "description": "删除成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
                         "description": "系统错误(code=30000)",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     }
                 }
@@ -117,9 +135,27 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
+                        "description": "返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
                         "description": "系统错误(code=30000)",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     }
                 }
@@ -149,9 +185,30 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
+                        "description": "返回Pod列表，每个Pod包含名称、就绪状态、运行状态、重启次数、运行时长、IP和所在节点",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
                         "description": "系统错误(code=30000)",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     }
                 }
@@ -176,7 +233,7 @@ const docTemplate = `{
                         "schema": {
                             "allOf": [
                                 {
-                                    "$ref": "#/definitions/response.Response"
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                                 },
                                 {
                                     "type": "object",
@@ -184,12 +241,18 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/resp.Namespace"
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace"
                                             }
                                         }
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     }
                 }
@@ -197,13 +260,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "req.Base": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Base": {
             "type": "object",
             "properties": {
                 "labels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
                     }
                 },
                 "name": {
@@ -218,7 +281,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Container": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Container": {
             "type": "object",
             "properties": {
                 "args": {
@@ -236,7 +299,7 @@ const docTemplate = `{
                 "env": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
                     }
                 },
                 "image": {
@@ -250,7 +313,7 @@ const docTemplate = `{
                     "description": "Survival probes",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -260,7 +323,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.ContainerPort"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort"
                     }
                 },
                 "privileged": {
@@ -271,7 +334,7 @@ const docTemplate = `{
                     "description": "Readiness Probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -279,7 +342,7 @@ const docTemplate = `{
                     "description": "Container application quota",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/req.Resource"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Resource"
                         }
                     ]
                 },
@@ -287,7 +350,7 @@ const docTemplate = `{
                     "description": "Start the probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -298,7 +361,7 @@ const docTemplate = `{
                     "description": "Mounted volumes",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.VolumeMount"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount"
                     }
                 },
                 "workingDir": {
@@ -306,7 +369,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.ContainerPort": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort": {
             "type": "object",
             "properties": {
                 "containerPort": {
@@ -320,11 +383,11 @@ const docTemplate = `{
                 }
             }
         },
-        "req.ContainerProbe": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe": {
             "type": "object",
             "properties": {
                 "command": {
-                    "$ref": "#/definitions/req.ProbeCommand"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand"
                 },
                 "enable": {
                     "description": "Whether to turn on the probe",
@@ -335,7 +398,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "httpGet": {
-                    "$ref": "#/definitions/req.ProbeHTTPGet"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet"
                 },
                 "initialDelaySeconds": {
                     "description": "Initialize for a number of seconds before starting the probe",
@@ -350,7 +413,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "tcpSocket": {
-                    "$ref": "#/definitions/req.ProbeTcpSocket"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket"
                 },
                 "timeoutSeconds": {
                     "description": "Probe timeout time",
@@ -362,7 +425,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.DnsConfig": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig": {
             "type": "object",
             "properties": {
                 "nameservers": {
@@ -373,7 +436,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Item": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Item": {
             "type": "object",
             "properties": {
                 "key": {
@@ -384,11 +447,11 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Network": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Network": {
             "type": "object",
             "properties": {
                 "dnsConfig": {
-                    "$ref": "#/definitions/req.DnsConfig"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig"
                 },
                 "dnsPolicy": {
                     "type": "string"
@@ -396,7 +459,7 @@ const docTemplate = `{
                 "hostAliases": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
                     }
                 },
                 "hostName": {
@@ -407,41 +470,41 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Pod": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Pod": {
             "type": "object",
             "properties": {
                 "base": {
                     "description": "base definition info",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/req.Base"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Base"
                         }
                     ]
                 },
                 "containers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container"
                     }
                 },
                 "initContainers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container"
                     }
                 },
                 "network": {
-                    "$ref": "#/definitions/req.Network"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Network"
                 },
                 "volume": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Volume"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Volume"
                     }
                 }
             }
         },
-        "req.ProbeCommand": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand": {
             "type": "object",
             "properties": {
                 "command": {
@@ -453,14 +516,14 @@ const docTemplate = `{
                 }
             }
         },
-        "req.ProbeHTTPGet": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet": {
             "type": "object",
             "properties": {
                 "headers": {
                     "description": "http headers",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
                     }
                 },
                 "host": {
@@ -479,7 +542,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.ProbeTcpSocket": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket": {
             "type": "object",
             "properties": {
                 "host": {
@@ -490,7 +553,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Resource": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Resource": {
             "type": "object",
             "properties": {
                 "CPULimit": {
@@ -513,7 +576,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.Volume": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.Volume": {
             "type": "object",
             "properties": {
                 "name": {
@@ -524,7 +587,7 @@ const docTemplate = `{
                 }
             }
         },
-        "req.VolumeMount": {
+        "github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount": {
             "type": "object",
             "properties": {
                 "mountName": {
@@ -540,7 +603,7 @@ const docTemplate = `{
                 }
             }
         },
-        "resp.Namespace": {
+        "github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace": {
             "type": "object",
             "properties": {
                 "createTime": {
@@ -554,7 +617,7 @@ const docTemplate = `{
                 }
             }
         },
-        "resp.PodListItem": {
+        "github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem": {
             "type": "object",
             "properties": {
                 "age": {
@@ -586,7 +649,7 @@ const docTemplate = `{
                 }
             }
         },
-        "response.Response": {
+        "github_com_crazyfrankie_kube-ctl_pkg_response.Response": {
             "type": "object",
             "properties": {
                 "code": {

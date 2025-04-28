@@ -1,9 +1,9 @@
 definitions:
-  req.Base:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Base:
     properties:
       labels:
         items:
-          $ref: '#/definitions/req.Item'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item'
         type: array
       name:
         type: string
@@ -13,7 +13,7 @@ definitions:
         description: 'reboot strategy: Always | Never | On-Failure'
         type: string
     type: object
-  req.Container:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Container:
     properties:
       args:
         items:
@@ -25,7 +25,7 @@ definitions:
         type: array
       env:
         items:
-          $ref: '#/definitions/req.Item'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item'
         type: array
       image:
         type: string
@@ -34,40 +34,40 @@ definitions:
         type: string
       livenessProbe:
         allOf:
-        - $ref: '#/definitions/req.ContainerProbe'
+        - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe'
         description: Survival probes
       name:
         type: string
       ports:
         items:
-          $ref: '#/definitions/req.ContainerPort'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort'
         type: array
       privileged:
         description: Whether to enable privileged mode (e.g. root)
         type: boolean
       readyProbe:
         allOf:
-        - $ref: '#/definitions/req.ContainerProbe'
+        - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe'
         description: Readiness Probe
       resources:
         allOf:
-        - $ref: '#/definitions/req.Resource'
+        - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Resource'
         description: Container application quota
       startUpProbe:
         allOf:
-        - $ref: '#/definitions/req.ContainerProbe'
+        - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe'
         description: Start the probe
       tty:
         type: boolean
       volumeMounts:
         description: Mounted volumes
         items:
-          $ref: '#/definitions/req.VolumeMount'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount'
         type: array
       workingDir:
         type: string
     type: object
-  req.ContainerPort:
+  github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort:
     properties:
       containerPort:
         type: integer
@@ -76,10 +76,10 @@ definitions:
       name:
         type: string
     type: object
-  req.ContainerProbe:
+  github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe:
     properties:
       command:
-        $ref: '#/definitions/req.ProbeCommand'
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand'
       enable:
         description: Whether to turn on the probe
         type: boolean
@@ -87,7 +87,7 @@ definitions:
         description: Threshold number of probes to consider a probe failure
         type: integer
       httpGet:
-        $ref: '#/definitions/req.ProbeHTTPGet'
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet'
       initialDelaySeconds:
         description: Initialize for a number of seconds before starting the probe
         type: integer
@@ -98,7 +98,7 @@ definitions:
         description: Threshold number of probes to consider a probe successful
         type: integer
       tcpSocket:
-        $ref: '#/definitions/req.ProbeTcpSocket'
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket'
       timeoutSeconds:
         description: Probe timeout time
         type: integer
@@ -106,57 +106,57 @@ definitions:
         description: 'Probe type: tcp | http | command'
         type: string
     type: object
-  req.DnsConfig:
+  github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig:
     properties:
       nameservers:
         items:
           type: string
         type: array
     type: object
-  req.Item:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Item:
     properties:
       key:
         type: string
       value:
         type: string
     type: object
-  req.Network:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Network:
     properties:
       dnsConfig:
-        $ref: '#/definitions/req.DnsConfig'
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig'
       dnsPolicy:
         type: string
       hostAliases:
         items:
-          $ref: '#/definitions/req.Item'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item'
         type: array
       hostName:
         type: string
       hostNetwork:
         type: boolean
     type: object
-  req.Pod:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Pod:
     properties:
       base:
         allOf:
-        - $ref: '#/definitions/req.Base'
+        - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Base'
         description: base definition info
       containers:
         items:
-          $ref: '#/definitions/req.Container'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container'
         type: array
       initContainers:
         items:
-          $ref: '#/definitions/req.Container'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container'
         type: array
       network:
-        $ref: '#/definitions/req.Network'
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Network'
       volume:
         items:
-          $ref: '#/definitions/req.Volume'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Volume'
         type: array
     type: object
-  req.ProbeCommand:
+  github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand:
     properties:
       command:
         description: cat /test/test.txt
@@ -164,12 +164,12 @@ definitions:
           type: string
         type: array
     type: object
-  req.ProbeHTTPGet:
+  github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet:
     properties:
       headers:
         description: http headers
         items:
-          $ref: '#/definitions/req.Item'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item'
         type: array
       host:
         description: If "", it's an in-pod request.
@@ -182,14 +182,14 @@ definitions:
         description: http | https
         type: string
     type: object
-  req.ProbeTcpSocket:
+  github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket:
     properties:
       host:
         type: string
       port:
         type: integer
     type: object
-  req.Resource:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Resource:
     properties:
       CPULimit:
         type: integer
@@ -205,14 +205,14 @@ definitions:
       memoryLimit:
         type: integer
     type: object
-  req.Volume:
+  github_com_crazyfrankie_kube-ctl_api_model_req.Volume:
     properties:
       name:
         type: string
       type:
         type: string
     type: object
-  req.VolumeMount:
+  github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount:
     properties:
       mountName:
         type: string
@@ -223,7 +223,7 @@ definitions:
         description: Read-only or not
         type: boolean
     type: object
-  resp.Namespace:
+  github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace:
     properties:
       createTime:
         type: integer
@@ -232,7 +232,7 @@ definitions:
       status:
         type: string
     type: object
-  resp.PodListItem:
+  github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem:
     properties:
       age:
         description: Runtime
@@ -255,7 +255,7 @@ definitions:
         description: Running | Error
         type: string
     type: object
-  response.Response:
+  github_com_crazyfrankie_kube-ctl_pkg_response.Response:
     properties:
       code:
         type: integer
@@ -286,9 +286,13 @@ paths:
       - application/json
       responses:
         "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
           description: 系统错误(code=30000)
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 删除Pod
       tags:
       - Pod管理
@@ -302,14 +306,22 @@ paths:
         name: pod
         required: true
         schema:
-          $ref: '#/definitions/req.Pod'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod'
       produces:
       - application/json
       responses:
         "200":
-          description: 参数错误(code=20001)或验证错误(code=20002)或系统错误(code=30000)
+          description: 操作成功，返回成功消息
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)或验证错误(code=20002)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 创建或更新Pod
       tags:
       - Pod管理
@@ -333,9 +345,18 @@ paths:
       - application/json
       responses:
         "200":
+          description: 返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod'
+              type: object
+        "500":
           description: 系统错误(code=30000)
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 获取Pod详情
       tags:
       - Pod管理
@@ -354,9 +375,20 @@ paths:
       - application/json
       responses:
         "200":
+          description: 返回Pod列表，每个Pod包含名称、就绪状态、运行状态、重启次数、运行时长、IP和所在节点
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem'
+                  type: array
+              type: object
+        "500":
           description: 系统错误(code=30000)
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 获取Pod列表
       tags:
       - Pod管理
@@ -372,13 +404,17 @@ paths:
           description: 返回命名空间列表，每个命名空间包含名称、创建时间和状态
           schema:
             allOf:
-            - $ref: '#/definitions/response.Response'
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
             - properties:
                 data:
                   items:
-                    $ref: '#/definitions/resp.Namespace'
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace'
                   type: array
               type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 获取命名空间列表
       tags:
       - Pod管理

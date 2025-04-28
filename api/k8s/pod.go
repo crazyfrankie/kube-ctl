@@ -34,12 +34,14 @@ func (p *PodHandler) RegisterRoute(r *gin.Engine) {
 	}
 }
 
+// GetNameSpace
 // @Summary 获取命名空间列表
 // @Description 获取所有可用的命名空间列表
 // @Tags Pod管理
 // @Accept json
 // @Produce json
 // @Success 200 {object} response.Response{data=[]resp.Namespace} "返回命名空间列表，每个命名空间包含名称、创建时间和状态"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pod/namespace [get]
 func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -62,14 +64,16 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 	}
 }
 
+// CreateOrUpdatePod
 // @Summary 创建或更新Pod
 // @Description 创建新的Pod或更新已存在的Pod
 // @Tags Pod管理
 // @Accept json
 // @Produce json
 // @Param pod body req.Pod true "Pod配置信息"
-// @Success 200 {object} response.Response "操作成功"
-// @Failure 200 {object} response.Response "参数错误(code=20001)或验证错误(code=20002)或系统错误(code=30000)"
+// @Success 200 {object} response.Response "操作成功，返回成功消息"
+// @Failure 400 {object} response.Response "参数错误(code=20001)或验证错误(code=20002)"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pod [post]
 func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -98,6 +102,7 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 	}
 }
 
+// GetPod
 // @Summary 获取Pod详情
 // @Description 获取指定命名空间下指定Pod的详细信息
 // @Tags Pod管理
@@ -105,8 +110,8 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 // @Produce json
 // @Param namespace query string true "命名空间"
 // @Param name query string true "Pod名称"
-// @Success 200 {object} response.Response{data=req.Pod} "返回Pod的详细信息"
-// @Failure 200 {object} response.Response "系统错误(code=30000)"
+// @Success 200 {object} response.Response{data=req.Pod} "返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pod/detail [get]
 func (p *PodHandler) GetPod() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -125,6 +130,7 @@ func (p *PodHandler) GetPod() gin.HandlerFunc {
 	}
 }
 
+// GetPodList
 // @Summary 获取Pod列表
 // @Description 获取指定命名空间下的所有Pod列表
 // @Tags Pod管理
@@ -132,7 +138,7 @@ func (p *PodHandler) GetPod() gin.HandlerFunc {
 // @Produce json
 // @Param namespace query string true "命名空间"
 // @Success 200 {object} response.Response{data=[]resp.PodListItem} "返回Pod列表，每个Pod包含名称、就绪状态、运行状态、重启次数、运行时长、IP和所在节点"
-// @Failure 200 {object} response.Response "系统错误(code=30000)"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pod/list [get]
 func (p *PodHandler) GetPodList() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -153,6 +159,7 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 	}
 }
 
+// DeletePod
 // @Summary 删除Pod
 // @Description 删除指定命名空间下的指定Pod
 // @Tags Pod管理
@@ -161,7 +168,7 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 // @Param namespace query string true "命名空间"
 // @Param name query string true "Pod名称"
 // @Success 200 {object} response.Response "删除成功"
-// @Failure 200 {object} response.Response "系统错误(code=30000)"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pod [delete]
 func (p *PodHandler) DeletePod() gin.HandlerFunc {
 	return func(c *gin.Context) {
