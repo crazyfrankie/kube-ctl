@@ -2,7 +2,6 @@ package convert
 
 import (
 	"fmt"
-	"github.com/crazyfrankie/kube-ctl/api/model/resp"
 	"strings"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 
 	"github.com/crazyfrankie/kube-ctl/api/model/req"
+	"github.com/crazyfrankie/kube-ctl/api/model/resp"
 )
 
 const (
@@ -217,12 +217,13 @@ func getPodHostAliases(as []req.Item) []corev1.HostAlias {
 
 // PodConvertReq corev1.Pod convert to req.Pod
 func PodConvertReq(pod *corev1.Pod) *req.Pod {
+	volume, volumeMap := getReqVolume(pod.Spec.Volumes)
 	return &req.Pod{
 		Base:           getReqBase(pod),
 		Network:        getReqNetwork(pod),
-		Volume:         getReqVolume(pod.Spec.Volumes),
-		InitContainers: getReqContainers(pod.Spec.InitContainers),
-		Containers:     getReqContainers(pod.Spec.Containers),
+		Volume:         volume,
+		InitContainers: getReqContainers(pod.Spec.InitContainers, volumeMap),
+		Containers:     getReqContainers(pod.Spec.Containers, volumeMap),
 	}
 }
 
@@ -277,22 +278,24 @@ func getReqHostAliases(host []corev1.HostAlias) []req.Item {
 	return res
 }
 
-func getReqVolume(volumes []corev1.Volume) []req.Volume {
+func getReqVolume(volumes []corev1.Volume) ([]req.Volume, map[string]string) {
 	res := make([]req.Volume, 0, len(volumes))
+	volumeMap := make(map[string]string)
 	for _, v := range volumes {
 		if v.EmptyDir == nil {
 			continue
 		}
+		volumeMap[v.Name] = ""
 		res = append(res, req.Volume{
 			Name: v.Name,
 			Type: EMPTYDIR,
 		})
 	}
 
-	return res
+	return res, volumeMap
 }
 
-func getReqContainers(containers []corev1.Container) []req.Container {
+func getReqContainers(containers []corev1.Container, volumeMap map[string]string) []req.Container {
 	res := make([]req.Container, 0, len(containers))
 	for _, c := range containers {
 		res = append(res, req.Container{
@@ -307,7 +310,7 @@ func getReqContainers(containers []corev1.Container) []req.Container {
 			Env:             getReqContainerEnv(c.Env),
 			Privileged:      *c.SecurityContext.Privileged,
 			Resources:       getReqContainerResource(&c.Resources),
-			VolumeMounts:    getReqContainerVolumeMount(c.VolumeMounts),
+			VolumeMounts:    getReqContainerVolumeMount(c.VolumeMounts, volumeMap),
 			StartUpProbe:    getReqContainerProbe(c.StartupProbe),
 			LivenessProbe:   getReqContainerProbe(c.LivenessProbe),
 			ReadinessProbe:  getReqContainerProbe(c.ReadinessProbe),
@@ -356,14 +359,17 @@ func getReqContainerResource(resource *corev1.ResourceRequirements) req.Resource
 	}
 }
 
-func getReqContainerVolumeMount(vm []corev1.VolumeMount) []req.VolumeMount {
+func getReqContainerVolumeMount(vm []corev1.VolumeMount, volumeMap map[string]string) []req.VolumeMount {
 	res := make([]req.VolumeMount, 0, len(vm))
 	for _, i := range vm {
-		res = append(res, req.VolumeMount{
-			MountName: i.Name,
-			MountPath: i.MountPath,
-			ReadOnly:  i.ReadOnly,
-		})
+		// Filter by non-emptyDir
+		if _, ok := volumeMap[i.Name]; ok {
+			res = append(res, req.VolumeMount{
+				MountName: i.Name,
+				MountPath: i.MountPath,
+				ReadOnly:  i.ReadOnly,
+			})
+		}
 	}
 
 	return res

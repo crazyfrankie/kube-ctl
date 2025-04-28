@@ -4,13 +4,12 @@ import (
 	"context"
 	es "errors"
 	"fmt"
-	"strings"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
+	"strings"
 )
 
 type PodService interface {
@@ -41,8 +40,13 @@ func (s *podService) CreateOrUpdatePod(ctx context.Context, pod *corev1.Pod) err
 			return err
 		}
 
+		bg := metav1.DeletePropagationBackground
+		var period int64 = 0
 		// Delete the Pod
-		err = s.clientSet.CoreV1().Pods(pod.Namespace).Delete(ctx, pod.Name, metav1.DeleteOptions{})
+		err = s.clientSet.CoreV1().Pods(pod.Namespace).Delete(ctx, pod.Name, metav1.DeleteOptions{
+			GracePeriodSeconds: &period,
+			PropagationPolicy:  &bg,
+		})
 		if err != nil {
 			return err
 		}

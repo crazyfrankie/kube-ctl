@@ -1,0 +1,14 @@
+# Kube-ctl
+Kube-ctl 是一个 kubernetes 的可视化系统. 提供给用户一系列方式操作 kubernetes 集群.
+
+## 技术栈
+Gin + [kubernetes/client-go](https://github.com/kubernetes/clien-go) + GORM + MySQL
+
+## 简介
+- Namespace 查询
+- Pod 创建、更新、删除、查询、详情
+- 
+- TODO
+
+## 项目前端
+[kube-ctl-web](https://github.com/crazyfrankie/kube-ctl-web)
