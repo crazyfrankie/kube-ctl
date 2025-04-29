@@ -3,17 +3,17 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
+	resp2 "github.com/crazyfrankie/kube-ctl/internal/api/model/resp"
+	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"net/http"
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/crazyfrankie/kube-ctl/api/model/req"
-	"github.com/crazyfrankie/kube-ctl/api/model/resp"
 	"github.com/crazyfrankie/kube-ctl/pkg/convert"
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
 	"github.com/crazyfrankie/kube-ctl/pkg/validate"
-	"github.com/crazyfrankie/kube-ctl/service"
 )
 
 type PodHandler struct {
@@ -53,9 +53,9 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 			return
 		}
 
-		ns := make([]resp.Namespace, 0, len(items))
+		ns := make([]resp2.Namespace, 0, len(items))
 		for _, i := range items {
-			ns = append(ns, resp.Namespace{
+			ns = append(ns, resp2.Namespace{
 				Name:       i.Name,
 				CreateTime: i.CreationTimestamp.Unix(),
 				Status:     string(i.Status.Phase),
@@ -152,7 +152,7 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 			return
 		}
 
-		pods := make([]resp.PodListItem, 0, len(items))
+		pods := make([]resp2.PodListItem, 0, len(items))
 		for _, i := range items {
 			pods = append(pods, convert.PodListConvertResp(i))
 		}

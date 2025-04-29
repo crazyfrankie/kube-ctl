@@ -3,8 +3,8 @@ package validate
 import (
 	"errors"
 	"fmt"
+	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
 
-	"github.com/crazyfrankie/kube-ctl/api/model/req"
 	"github.com/crazyfrankie/kube-ctl/pkg/consts"
 )
 

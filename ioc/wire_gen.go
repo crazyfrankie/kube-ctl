@@ -7,10 +7,10 @@
 package ioc
 
 import (
-	"github.com/crazyfrankie/kube-ctl/api/k8s"
-	"github.com/crazyfrankie/kube-ctl/api/mw"
 	"github.com/crazyfrankie/kube-ctl/docs"
-	"github.com/crazyfrankie/kube-ctl/service"
+	"github.com/crazyfrankie/kube-ctl/internal/api/k8s"
+	"github.com/crazyfrankie/kube-ctl/internal/api/mw"
+	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
