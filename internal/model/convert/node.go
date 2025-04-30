@@ -1,8 +1,9 @@
 package convert
 
 import (
-	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	corev1 "k8s.io/api/core/v1"
+
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 )
 
 func NodeListItemConvertResp(node corev1.Node) resp.NodeListItem {

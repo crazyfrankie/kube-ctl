@@ -8,12 +8,12 @@ import (
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
 
+	"github.com/crazyfrankie/kube-ctl/internal/model/convert"
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/internal/model/validate"
 	"github.com/crazyfrankie/kube-ctl/internal/service"
-	"github.com/crazyfrankie/kube-ctl/pkg/convert"
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
-	"github.com/crazyfrankie/kube-ctl/pkg/validate"
 )
 
 type PodHandler struct {

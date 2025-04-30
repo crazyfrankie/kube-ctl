@@ -2,8 +2,6 @@ package convert
 
 import (
 	"fmt"
-	"github.com/crazyfrankie/kube-ctl/internal/model/req"
-	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	"strings"
 	"time"
 
@@ -11,6 +9,9 @@ import (
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
+
+	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 )
 
 const (
