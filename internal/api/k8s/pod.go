@@ -3,14 +3,14 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
-	resp2 "github.com/crazyfrankie/kube-ctl/internal/api/model/resp"
-	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"net/http"
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
 
+	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/api/model/resp"
+	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"github.com/crazyfrankie/kube-ctl/pkg/convert"
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
 	"github.com/crazyfrankie/kube-ctl/pkg/validate"
@@ -53,9 +53,9 @@ func (p *PodHandler) GetNameSpace() gin.HandlerFunc {
 			return
 		}
 
-		ns := make([]resp2.Namespace, 0, len(items))
+		ns := make([]resp.Namespace, 0, len(items))
 		for _, i := range items {
-			ns = append(ns, resp2.Namespace{
+			ns = append(ns, resp.Namespace{
 				Name:       i.Name,
 				CreateTime: i.CreationTimestamp.Unix(),
 				Status:     string(i.Status.Phase),
@@ -92,15 +92,13 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 			return
 		}
 
-		pod := convert.PodReqConvert(&reqPod)
-
-		err = p.svc.CreateOrUpdatePod(context.Background(), pod)
+		err = p.svc.CreateOrUpdatePod(context.Background(), &reqPod)
 		if err != nil {
 			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
 
-		response.SuccessWithMsg(c, fmt.Sprintf("Pod[namespace=%s,name=%s] action success", pod.Namespace, pod.Name))
+		response.SuccessWithMsg(c, fmt.Sprintf("Pod[namespace=%s,name=%s] action success", reqPod.Base.Namespace, reqPod.Base.Name))
 	}
 }
 
@@ -152,7 +150,7 @@ func (p *PodHandler) GetPodList() gin.HandlerFunc {
 			return
 		}
 
-		pods := make([]resp2.PodListItem, 0, len(items))
+		pods := make([]resp.PodListItem, 0, len(items))
 		for _, i := range items {
 			pods = append(pods, convert.PodListConvertResp(i))
 		}

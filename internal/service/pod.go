@@ -11,10 +11,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
+	"github.com/crazyfrankie/kube-ctl/pkg/convert"
 )
 
 type PodService interface {
-	CreateOrUpdatePod(ctx context.Context, pod *corev1.Pod) error
+	CreateOrUpdatePod(ctx context.Context, req *req.Pod) error
 	GetPod(ctx context.Context, namespace, name string) (*corev1.Pod, error)
 	GetPodList(ctx context.Context, namespace string) ([]corev1.Pod, error)
 	DeletePod(ctx context.Context, namespace string, name string) error
@@ -30,7 +33,8 @@ func NewPodService(cs *kubernetes.Clientset) PodService {
 	return &podService{clientSet: cs}
 }
 
-func (s *podService) CreateOrUpdatePod(ctx context.Context, pod *corev1.Pod) error {
+func (s *podService) CreateOrUpdatePod(ctx context.Context, reqPod *req.Pod) error {
+	pod := convert.PodReqConvert(reqPod)
 	if get, err := s.clientSet.CoreV1().Pods(pod.Namespace).
 		Get(ctx, pod.Name, metav1.GetOptions{}); err == nil {
 		// Verify that the parameters are legal

@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod"
                         }
                     }
                 ],
@@ -145,7 +145,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Pod"
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod"
                                         }
                                     }
                                 }
@@ -197,7 +197,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem"
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem"
                                             }
                                         }
                                     }
@@ -241,7 +241,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace"
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Namespace"
                                             }
                                         }
                                     }
@@ -299,7 +299,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem"
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem"
                                         }
                                     }
                                 }
@@ -317,13 +317,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Base": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Base": {
             "type": "object",
             "properties": {
                 "labels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
                     }
                 },
                 "name": {
@@ -338,7 +338,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Container": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container": {
             "type": "object",
             "properties": {
                 "args": {
@@ -356,7 +356,7 @@ const docTemplate = `{
                 "env": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
                     }
                 },
                 "image": {
@@ -370,7 +370,7 @@ const docTemplate = `{
                     "description": "Survival probes",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -380,7 +380,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerPort"
                     }
                 },
                 "privileged": {
@@ -391,7 +391,7 @@ const docTemplate = `{
                     "description": "Readiness Probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -399,7 +399,7 @@ const docTemplate = `{
                     "description": "Container application quota",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Resource"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Resource"
                         }
                     ]
                 },
@@ -407,7 +407,7 @@ const docTemplate = `{
                     "description": "Start the probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -418,7 +418,7 @@ const docTemplate = `{
                     "description": "Mounted volumes",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.VolumeMount"
                     }
                 },
                 "workingDir": {
@@ -426,7 +426,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.ContainerPort": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerPort": {
             "type": "object",
             "properties": {
                 "containerPort": {
@@ -440,11 +440,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.ContainerProbe": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe": {
             "type": "object",
             "properties": {
                 "command": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeCommand"
                 },
                 "enable": {
                     "description": "Whether to turn on the probe",
@@ -455,7 +455,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "httpGet": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeHTTPGet"
                 },
                 "initialDelaySeconds": {
                     "description": "Initialize for a number of seconds before starting the probe",
@@ -470,7 +470,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "tcpSocket": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeTcpSocket"
                 },
                 "timeoutSeconds": {
                     "description": "Probe timeout time",
@@ -482,7 +482,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.DnsConfig": {
             "type": "object",
             "properties": {
                 "nameservers": {
@@ -493,7 +493,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Item": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item": {
             "type": "object",
             "properties": {
                 "key": {
@@ -504,11 +504,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Network": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Network": {
             "type": "object",
             "properties": {
                 "dnsConfig": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.DnsConfig"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.DnsConfig"
                 },
                 "dnsPolicy": {
                     "type": "string"
@@ -516,7 +516,7 @@ const docTemplate = `{
                 "hostAliases": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
                     }
                 },
                 "hostName": {
@@ -527,41 +527,41 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Pod": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod": {
             "type": "object",
             "properties": {
                 "base": {
                     "description": "base definition info",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Base"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Base"
                         }
                     ]
                 },
                 "containers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container"
                     }
                 },
                 "initContainers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container"
                     }
                 },
                 "network": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Network"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Network"
                 },
                 "volume": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Volume"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Volume"
                     }
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeCommand": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeCommand": {
             "type": "object",
             "properties": {
                 "command": {
@@ -573,14 +573,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeHTTPGet": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeHTTPGet": {
             "type": "object",
             "properties": {
                 "headers": {
                     "description": "http headers",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
                     }
                 },
                 "host": {
@@ -599,7 +599,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.ProbeTcpSocket": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeTcpSocket": {
             "type": "object",
             "properties": {
                 "host": {
@@ -610,7 +610,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Resource": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Resource": {
             "type": "object",
             "properties": {
                 "CPULimit": {
@@ -633,7 +633,21 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.Volume": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.UpdateLabelReq": {
+            "type": "object",
+            "properties": {
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Volume": {
             "type": "object",
             "properties": {
                 "name": {
@@ -644,7 +658,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_req.VolumeMount": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.VolumeMount": {
             "type": "object",
             "properties": {
                 "mountName": {
@@ -660,7 +674,18 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_resp.Namespace": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Item": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Namespace": {
             "type": "object",
             "properties": {
                 "createTime": {
@@ -674,7 +699,85 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_api_model_resp.PodListItem": {
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.NodeDetail": {
+            "type": "object",
+            "properties": {
+                "OSImage": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "containerRuntime": {
+                    "type": "string"
+                },
+                "externalIP": {
+                    "type": "string"
+                },
+                "internalIP": {
+                    "type": "string"
+                },
+                "kernelVersion": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "taints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Taint"
+                    }
+                },
+                "version": {
+                    "description": "kubelet version",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.NodeListItem": {
+            "type": "object",
+            "properties": {
+                "OSImage": {
+                    "type": "string"
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "containerRuntime": {
+                    "type": "string"
+                },
+                "externalIP": {
+                    "type": "string"
+                },
+                "internalIP": {
+                    "type": "string"
+                },
+                "kernelVersion": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "description": "kubelet version",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem": {
             "type": "object",
             "properties": {
                 "age": {
@@ -717,6 +820,44 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "v1.Taint": {
+            "type": "object",
+            "properties": {
+                "effect": {
+                    "description": "Required. The effect of the taint on pods\nthat do not tolerate the taint.\nValid effects are NoSchedule, PreferNoSchedule and NoExecute.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.TaintEffect"
+                        }
+                    ]
+                },
+                "key": {
+                    "description": "Required. The taint key to be applied to a node.",
+                    "type": "string"
+                },
+                "timeAdded": {
+                    "description": "TimeAdded represents the time at which the taint was added.\nIt is only written for NoExecute taints.\n+optional",
+                    "type": "string"
+                },
+                "value": {
+                    "description": "The taint value corresponding to the taint key.\n+optional",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.TaintEffect": {
+            "type": "string",
+            "enum": [
+                "NoSchedule",
+                "PreferNoSchedule",
+                "NoExecute"
+            ],
+            "x-enum-varnames": [
+                "TaintEffectNoSchedule",
+                "TaintEffectPreferNoSchedule",
+                "TaintEffectNoExecute"
+            ]
         }
     }
 }`
