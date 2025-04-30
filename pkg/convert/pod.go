@@ -2,8 +2,8 @@ package convert
 
 import (
 	"fmt"
-	"github.com/crazyfrankie/kube-ctl/internal/api/model/req"
-	"github.com/crazyfrankie/kube-ctl/internal/api/model/resp"
+	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	"strings"
 	"time"
 

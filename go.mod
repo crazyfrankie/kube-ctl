@@ -3,6 +3,7 @@ module github.com/crazyfrankie/kube-ctl
 go 1.24.2
 
 require (
+	github.com/bytedance/sonic v1.13.2
 	github.com/crazyfrankie/gem v0.0.9
 	github.com/gin-contrib/cors v1.7.5
 	github.com/gin-gonic/gin v1.10.0
@@ -18,7 +19,6 @@ require (
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
-	github.com/bytedance/sonic v1.13.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.4 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
