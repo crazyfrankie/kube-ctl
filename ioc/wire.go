@@ -38,11 +38,11 @@ func InitMws() []gin.HandlerFunc {
 	}
 }
 
-func InitGin(pod *k8s.PodHandler, mws []gin.HandlerFunc) *gin.Engine {
+func InitGin(pod *k8s.PodHandler, node *k8s.NodeHandler, mws []gin.HandlerFunc) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 	pod.RegisterRoute(srv)
-
+	node.RegisterRoute(srv)
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	docs.SwaggerInfo.BasePath = "/api"
@@ -56,7 +56,9 @@ func InitServer() *gin.Engine {
 		InitKubernetes,
 
 		service.NewPodService,
+		service.NewNodeService,
 		k8s.NewPodHandler,
+		k8s.NewNodeHandler,
 
 		InitGin,
 	)
