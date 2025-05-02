@@ -517,7 +517,7 @@ func getReqPodNodeScheduling(pod *corev1.Pod) req.NodeScheduling {
 		scheduling.NodeSelector = res
 	}
 
-	if pod.Spec.Affinity != nil {
+	if pod.Spec.Affinity != nil && pod.Spec.Affinity.NodeAffinity != nil {
 		// Hard affinity scheduling by default
 		scheduling.Type = ScheduleNodeAffinity
 		term := pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0]
