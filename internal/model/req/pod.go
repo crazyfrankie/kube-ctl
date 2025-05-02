@@ -9,6 +9,7 @@ type Pod struct {
 	InitContainers []Container         `json:"initContainers"`
 	Containers     []Container         `json:"containers"`
 	Tolerations    []corev1.Toleration `json:"tolerations"` // pod toleration params
+	NodeScheduling NodeScheduling      `json:"nodeScheduling"`
 }
 
 type Base struct {
@@ -111,4 +112,17 @@ type ProbeTime struct {
 	TimeoutSeconds      int32 `json:"timeoutSeconds"`      // Probe timeout time
 	SuccessThreshold    int32 `json:"successThreshold"`    // Threshold number of probes to consider a probe successful
 	FailureThreshold    int32 `json:"failureThreshold"`    // Threshold number of probes to consider a probe failure
+}
+
+type NodeScheduling struct {
+	Type         string                        `json:"type"` // nodeName | nodeSelector | nodeAffinity
+	NodeName     string                        `json:"nodeName"`
+	NodeSelector []Item                        `json:"nodeSelector"`
+	NodeAffinity []NodeAffinityTermExpressions `json:"nodeAffinity"`
+}
+
+type NodeAffinityTermExpressions struct {
+	Key      string                      `json:"key"`
+	Value    string                      `json:"value"`
+	Operator corev1.NodeSelectorOperator `json:"operator"`
 }

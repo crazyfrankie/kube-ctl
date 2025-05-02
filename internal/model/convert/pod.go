@@ -20,10 +20,18 @@ const (
 	EXECProbe = "exec"
 
 	EMPTYDIR = "emptyDir"
+
+	ScheduleNodeName     = "nodeName"
+	ScheduleNodeSelector = "nodeSelector"
+	ScheduleNodeAffinity = "nodeAffinity"
+	ScheduleNodeAny      = "nodeAny"
 )
 
 // PodReqConvert convert req.Pod to corev1.Pod
 func PodReqConvert(req *req.Pod) *corev1.Pod {
+	// get node scheduling
+	affinity, selector, nodeName := getPodNodeScheduling(req.NodeScheduling)
+
 	return &corev1.Pod{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              req.Base.Name,
@@ -43,6 +51,9 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 			},
 			DNSPolicy:     corev1.DNSPolicy(req.Network.DnsPolicy),
 			RestartPolicy: corev1.RestartPolicy(req.Base.RestartPolicy),
+			NodeName:      nodeName,
+			NodeSelector:  selector,
+			Affinity:      affinity,
 		},
 	}
 }
@@ -216,6 +227,46 @@ func getPodHostAliases(as []req.Item) []corev1.HostAlias {
 	return res
 }
 
+func getPodNodeScheduling(sch req.NodeScheduling) (*corev1.Affinity, map[string]string, string) {
+	switch sch.Type {
+	case ScheduleNodeName:
+		return nil, nil, sch.NodeName
+	case ScheduleNodeSelector:
+		res := make(map[string]string)
+		for _, i := range sch.NodeSelector {
+			res[i.Key] = i.Value
+		}
+		return nil, res, ""
+	case ScheduleNodeAffinity:
+		expr := sch.NodeAffinity
+		matchExpr := make([]corev1.NodeSelectorRequirement, 0, len(expr))
+		for _, e := range expr {
+			matchExpr = append(matchExpr, corev1.NodeSelectorRequirement{
+				Key:      e.Key,
+				Operator: e.Operator,
+				Values:   strings.Split(e.Value, ","),
+			})
+		}
+		res := &corev1.Affinity{
+			NodeAffinity: &corev1.NodeAffinity{
+				RequiredDuringSchedulingIgnoredDuringExecution: &corev1.NodeSelector{
+					NodeSelectorTerms: []corev1.NodeSelectorTerm{
+						{
+							MatchExpressions: matchExpr,
+						},
+					}},
+			},
+		}
+		return res, nil, ""
+	case ScheduleNodeAny:
+		// do nothing
+		return nil, nil, ""
+	default:
+		// do nothing
+		return nil, nil, ""
+	}
+}
+
 // PodConvertReq corev1.Pod convert to req.Pod
 func PodConvertReq(pod *corev1.Pod) *req.Pod {
 	volume, volumeMap := getReqVolume(pod.Spec.Volumes)
@@ -226,6 +277,7 @@ func PodConvertReq(pod *corev1.Pod) *req.Pod {
 		InitContainers: getReqContainers(pod.Spec.InitContainers, volumeMap),
 		Containers:     getReqContainers(pod.Spec.Containers, volumeMap),
 		Tolerations:    pod.Spec.Tolerations,
+		NodeScheduling: getReqPodNodeScheduling(pod),
 	}
 }
 
@@ -449,6 +501,43 @@ func getReqProbeHTTPHeaders(header []corev1.HTTPHeader) []req.Item {
 	}
 
 	return res
+}
+
+func getReqPodNodeScheduling(pod *corev1.Pod) req.NodeScheduling {
+	scheduling := req.NodeScheduling{Type: ScheduleNodeAny}
+	if pod.Spec.NodeSelector != nil {
+		scheduling.Type = ScheduleNodeSelector
+		res := make([]req.Item, 0, len(pod.Spec.NodeSelector))
+		for k, v := range pod.Spec.NodeSelector {
+			res = append(res, req.Item{
+				Key:   k,
+				Value: v,
+			})
+		}
+		scheduling.NodeSelector = res
+	}
+
+	if pod.Spec.Affinity != nil {
+		// Hard affinity scheduling by default
+		scheduling.Type = ScheduleNodeAffinity
+		term := pod.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0]
+		res := make([]req.NodeAffinityTermExpressions, 0, len(term.MatchExpressions))
+		for _, e := range term.MatchExpressions {
+			res = append(res, req.NodeAffinityTermExpressions{
+				Key:      e.Key,
+				Value:    strings.Join(e.Values, ","),
+				Operator: e.Operator,
+			})
+		}
+		scheduling.NodeAffinity = res
+	}
+
+	if pod.Spec.NodeName != "" {
+		scheduling.Type = ScheduleNodeName
+		scheduling.NodeName = pod.Spec.NodeName
+	}
+
+	return scheduling
 }
 
 func PodListConvertResp(pod corev1.Pod) resp.PodListItem {

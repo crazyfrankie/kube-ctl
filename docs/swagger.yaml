@@ -135,6 +135,31 @@ definitions:
       hostNetwork:
         type: boolean
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.NodeAffinityTermExpressions:
+    properties:
+      key:
+        type: string
+      operator:
+        $ref: '#/definitions/v1.NodeSelectorOperator'
+      value:
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.NodeScheduling:
+    properties:
+      nodeAffinity:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NodeAffinityTermExpressions'
+        type: array
+      nodeName:
+        type: string
+      nodeSelector:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      type:
+        description: nodeName | nodeSelector | nodeAffinity
+        type: string
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Pod:
     properties:
       base:
@@ -151,6 +176,8 @@ definitions:
         type: array
       network:
         $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Network'
+      nodeScheduling:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NodeScheduling'
       tolerations:
         description: pod toleration params
         items:
@@ -345,6 +372,22 @@ definitions:
       msg:
         type: string
     type: object
+  v1.NodeSelectorOperator:
+    enum:
+    - In
+    - NotIn
+    - Exists
+    - DoesNotExist
+    - Gt
+    - Lt
+    type: string
+    x-enum-varnames:
+    - NodeSelectorOpIn
+    - NodeSelectorOpNotIn
+    - NodeSelectorOpExists
+    - NodeSelectorOpDoesNotExist
+    - NodeSelectorOpGt
+    - NodeSelectorOpLt
   v1.Taint:
     properties:
       effect:

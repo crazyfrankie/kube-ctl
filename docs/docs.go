@@ -770,6 +770,44 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.NodeAffinityTermExpressions": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "operator": {
+                    "$ref": "#/definitions/v1.NodeSelectorOperator"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.NodeScheduling": {
+            "type": "object",
+            "properties": {
+                "nodeAffinity": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NodeAffinityTermExpressions"
+                    }
+                },
+                "nodeName": {
+                    "type": "string"
+                },
+                "nodeSelector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "type": {
+                    "description": "nodeName | nodeSelector | nodeAffinity",
+                    "type": "string"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Pod": {
             "type": "object",
             "properties": {
@@ -795,6 +833,9 @@ const docTemplate = `{
                 },
                 "network": {
                     "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Network"
+                },
+                "nodeScheduling": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NodeScheduling"
                 },
                 "tolerations": {
                     "description": "pod toleration params",
@@ -1084,6 +1125,25 @@ const docTemplate = `{
                     "type": "string"
                 }
             }
+        },
+        "v1.NodeSelectorOperator": {
+            "type": "string",
+            "enum": [
+                "In",
+                "NotIn",
+                "Exists",
+                "DoesNotExist",
+                "Gt",
+                "Lt"
+            ],
+            "x-enum-varnames": [
+                "NodeSelectorOpIn",
+                "NodeSelectorOpNotIn",
+                "NodeSelectorOpExists",
+                "NodeSelectorOpDoesNotExist",
+                "NodeSelectorOpGt",
+                "NodeSelectorOpLt"
+            ]
         },
         "v1.Taint": {
             "type": "object",
