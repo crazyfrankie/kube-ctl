@@ -1,11 +1,14 @@
 package req
 
+import corev1 "k8s.io/api/core/v1"
+
 type Pod struct {
-	Base           Base        `json:"base"` // base definition info
-	Volume         []Volume    `json:"volume"`
-	Network        Network     `json:"network"`
-	InitContainers []Container `json:"initContainers"`
-	Containers     []Container `json:"containers"`
+	Base           Base                `json:"base"` // base definition info
+	Volume         []Volume            `json:"volume"`
+	Network        Network             `json:"network"`
+	InitContainers []Container         `json:"initContainers"`
+	Containers     []Container         `json:"containers"`
+	Tolerations    []corev1.Toleration `json:"tolerations"` // pod toleration params
 }
 
 type Base struct {

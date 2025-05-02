@@ -16,6 +16,8 @@ type NodeService interface {
 	NodeList(ctx context.Context) ([]corev1.Node, error)
 	NodeDetail(ctx context.Context, name string) (*corev1.Node, error)
 	UpdateNodeLabel(ctx context.Context, req req.UpdateLabelReq) error
+	UpdateNodeTaints(ctx context.Context, req req.UpdateTaintReq) error
+	GetNodePods(ctx context.Context, namespace string, nodeName string) ([]corev1.Pod, error)
 }
 
 type nodeService struct {
@@ -50,6 +52,7 @@ func (s *nodeService) UpdateNodeLabel(ctx context.Context, req req.UpdateLabelRe
 		labels[l.Key] = l.Value
 	}
 
+	labels["$patch"] = "replace"
 	update := map[string]any{
 		"metadata": map[string]any{
 			"labels": labels,
@@ -64,4 +67,37 @@ func (s *nodeService) UpdateNodeLabel(ctx context.Context, req req.UpdateLabelRe
 	_, err = s.clientSet.CoreV1().Nodes().Patch(ctx, req.Name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
 
 	return err
+}
+
+func (s *nodeService) UpdateNodeTaints(ctx context.Context, req req.UpdateTaintReq) error {
+	taints := map[string]any{
+		"spec": map[string]any{
+			"taints": req.Taints,
+		},
+	}
+
+	data, err := sonic.Marshal(taints)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.clientSet.CoreV1().Nodes().Patch(ctx, req.Name, types.StrategicMergePatchType, data, metav1.PatchOptions{})
+
+	return err
+}
+
+func (s *nodeService) GetNodePods(ctx context.Context, namespace string, nodeName string) ([]corev1.Pod, error) {
+	pods, err := s.clientSet.CoreV1().Pods(namespace).List(ctx, metav1.ListOptions{})
+	if err != nil {
+		panic(err.Error())
+	}
+
+	res := make([]corev1.Pod, 0, len(pods.Items))
+	for _, i := range pods.Items {
+		if i.Spec.NodeName == nodeName {
+			res = append(res, i)
+		}
+	}
+
+	return res, nil
 }

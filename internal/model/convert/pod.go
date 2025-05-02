@@ -32,6 +32,7 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 			Labels:            getPodLabels(req.Base.Labels),
 		},
 		Spec: corev1.PodSpec{
+			Tolerations:    req.Tolerations,
 			Volumes:        getPodVolumes(req.Volume),
 			InitContainers: getPodContainers(req.InitContainers),
 			Containers:     getPodContainers(req.Containers),
@@ -224,6 +225,7 @@ func PodConvertReq(pod *corev1.Pod) *req.Pod {
 		Volume:         volume,
 		InitContainers: getReqContainers(pod.Spec.InitContainers, volumeMap),
 		Containers:     getReqContainers(pod.Spec.Containers, volumeMap),
+		Tolerations:    pod.Spec.Tolerations,
 	}
 }
 

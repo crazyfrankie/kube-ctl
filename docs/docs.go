@@ -15,6 +15,249 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/node/detail": {
+            "get": {
+                "description": "获取集群中单个 Node 信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Node管理"
+                ],
+                "summary": "获取 Node 详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node name",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.NodeDetail"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/node/label": {
+            "put": {
+                "description": "为单个 Node 添加 label",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Node管理"
+                ],
+                "summary": "Node 添加标签",
+                "parameters": [
+                    {
+                        "description": "node name and labels",
+                        "name": "node",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/node/list": {
+            "get": {
+                "description": "获取集群中所有 Node 信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Node管理"
+                ],
+                "summary": "获取 Node 列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "node 关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.NodeListItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/node/pods": {
+            "get": {
+                "description": "集群中某个节点下的所有 Pod",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Node管理"
+                ],
+                "summary": "Node 下的所有 Pod",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Node 名称",
+                        "name": "node",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "查询成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/node/taint": {
+            "put": {
+                "description": "集群中某个节点的污点更新",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Node管理"
+                ],
+                "summary": "Node 污点更新",
+                "parameters": [
+                    {
+                        "description": "node name and taints",
+                        "name": "node",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateTaintReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/pod": {
             "post": {
                 "description": "创建新的Pod或更新已存在的Pod",
@@ -35,7 +278,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod"
                         }
                     }
                 ],
@@ -145,7 +388,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod"
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod"
                                         }
                                     }
                                 }
@@ -197,7 +440,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem"
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem"
                                             }
                                         }
                                     }
@@ -241,7 +484,7 @@ const docTemplate = `{
                                         "data": {
                                             "type": "array",
                                             "items": {
-                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Namespace"
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Namespace"
                                             }
                                         }
                                     }
@@ -299,7 +542,7 @@ const docTemplate = `{
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem"
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem"
                                         }
                                     }
                                 }
@@ -317,13 +560,13 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Base": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Base": {
             "type": "object",
             "properties": {
                 "labels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
                     }
                 },
                 "name": {
@@ -338,7 +581,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Container": {
             "type": "object",
             "properties": {
                 "args": {
@@ -356,7 +599,7 @@ const docTemplate = `{
                 "env": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
                     }
                 },
                 "image": {
@@ -370,7 +613,7 @@ const docTemplate = `{
                     "description": "Survival probes",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -380,7 +623,7 @@ const docTemplate = `{
                 "ports": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerPort"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerPort"
                     }
                 },
                 "privileged": {
@@ -391,7 +634,7 @@ const docTemplate = `{
                     "description": "Readiness Probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -399,7 +642,7 @@ const docTemplate = `{
                     "description": "Container application quota",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Resource"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Resource"
                         }
                     ]
                 },
@@ -407,7 +650,7 @@ const docTemplate = `{
                     "description": "Start the probe",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerProbe"
                         }
                     ]
                 },
@@ -418,7 +661,7 @@ const docTemplate = `{
                     "description": "Mounted volumes",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.VolumeMount"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeMount"
                     }
                 },
                 "workingDir": {
@@ -426,7 +669,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerPort": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerPort": {
             "type": "object",
             "properties": {
                 "containerPort": {
@@ -440,11 +683,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ContainerProbe": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ContainerProbe": {
             "type": "object",
             "properties": {
                 "command": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeCommand"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeCommand"
                 },
                 "enable": {
                     "description": "Whether to turn on the probe",
@@ -455,7 +698,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "httpGet": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeHTTPGet"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeHTTPGet"
                 },
                 "initialDelaySeconds": {
                     "description": "Initialize for a number of seconds before starting the probe",
@@ -470,7 +713,7 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "tcpSocket": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeTcpSocket"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeTcpSocket"
                 },
                 "timeoutSeconds": {
                     "description": "Probe timeout time",
@@ -482,7 +725,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.DnsConfig": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.DnsConfig": {
             "type": "object",
             "properties": {
                 "nameservers": {
@@ -493,7 +736,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Item": {
             "type": "object",
             "properties": {
                 "key": {
@@ -504,11 +747,11 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Network": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Network": {
             "type": "object",
             "properties": {
                 "dnsConfig": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.DnsConfig"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DnsConfig"
                 },
                 "dnsPolicy": {
                     "type": "string"
@@ -516,7 +759,7 @@ const docTemplate = `{
                 "hostAliases": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
                     }
                 },
                 "hostName": {
@@ -527,41 +770,48 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Pod": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Pod": {
             "type": "object",
             "properties": {
                 "base": {
                     "description": "base definition info",
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Base"
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Base"
                         }
                     ]
                 },
                 "containers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Container"
                     }
                 },
                 "initContainers": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Container"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Container"
                     }
                 },
                 "network": {
-                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Network"
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Network"
+                },
+                "tolerations": {
+                    "description": "pod toleration params",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Toleration"
+                    }
                 },
                 "volume": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Volume"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Volume"
                     }
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeCommand": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeCommand": {
             "type": "object",
             "properties": {
                 "command": {
@@ -573,14 +823,14 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeHTTPGet": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeHTTPGet": {
             "type": "object",
             "properties": {
                 "headers": {
                     "description": "http headers",
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
                     }
                 },
                 "host": {
@@ -599,7 +849,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.ProbeTcpSocket": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ProbeTcpSocket": {
             "type": "object",
             "properties": {
                 "host": {
@@ -610,7 +860,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Resource": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Resource": {
             "type": "object",
             "properties": {
                 "CPULimit": {
@@ -633,13 +883,13 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.UpdateLabelReq": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq": {
             "type": "object",
             "properties": {
                 "labels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
                     }
                 },
                 "name": {
@@ -647,7 +897,21 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.Volume": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateTaintReq": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "taints": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.Taint"
+                    }
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Volume": {
             "type": "object",
             "properties": {
                 "name": {
@@ -658,7 +922,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_req.VolumeMount": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeMount": {
             "type": "object",
             "properties": {
                 "mountName": {
@@ -674,7 +938,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Item": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.Item": {
             "type": "object",
             "properties": {
                 "key": {
@@ -685,7 +949,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Namespace": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.Namespace": {
             "type": "object",
             "properties": {
                 "createTime": {
@@ -699,7 +963,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.NodeDetail": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.NodeDetail": {
             "type": "object",
             "properties": {
                 "OSImage": {
@@ -723,7 +987,7 @@ const docTemplate = `{
                 "labels": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_api_model_resp.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item"
                     }
                 },
                 "name": {
@@ -744,7 +1008,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.NodeListItem": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.NodeListItem": {
             "type": "object",
             "properties": {
                 "OSImage": {
@@ -777,7 +1041,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_crazyfrankie_kube-ctl_internal_api_model_resp.PodListItem": {
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem": {
             "type": "object",
             "properties": {
                 "age": {
@@ -857,6 +1121,50 @@ const docTemplate = `{
                 "TaintEffectNoSchedule",
                 "TaintEffectPreferNoSchedule",
                 "TaintEffectNoExecute"
+            ]
+        },
+        "v1.Toleration": {
+            "type": "object",
+            "properties": {
+                "effect": {
+                    "description": "Effect indicates the taint effect to match. Empty means match all taint effects.\nWhen specified, allowed values are NoSchedule, PreferNoSchedule and NoExecute.\n+optional",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.TaintEffect"
+                        }
+                    ]
+                },
+                "key": {
+                    "description": "Key is the taint key that the toleration applies to. Empty means match all taint keys.\nIf the key is empty, operator must be Exists; this combination means to match all values and all keys.\n+optional",
+                    "type": "string"
+                },
+                "operator": {
+                    "description": "Operator represents a key's relationship to the value.\nValid operators are Exists and Equal. Defaults to Equal.\nExists is equivalent to wildcard for value, so that a pod can\ntolerate all taints of a particular category.\n+optional",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.TolerationOperator"
+                        }
+                    ]
+                },
+                "tolerationSeconds": {
+                    "description": "TolerationSeconds represents the period of time the toleration (which must be\nof effect NoExecute, otherwise this field is ignored) tolerates the taint. By default,\nit is not set, which means tolerate the taint forever (do not evict). Zero and\nnegative values will be treated as 0 (evict immediately) by the system.\n+optional",
+                    "type": "integer"
+                },
+                "value": {
+                    "description": "Value is the taint value the toleration matches to.\nIf the operator is Exists, the value should be empty, otherwise just a regular string.\n+optional",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.TolerationOperator": {
+            "type": "string",
+            "enum": [
+                "Exists",
+                "Equal"
+            ],
+            "x-enum-varnames": [
+                "TolerationOpExists",
+                "TolerationOpEqual"
             ]
         }
     }
