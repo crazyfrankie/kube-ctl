@@ -7,7 +7,8 @@ Gin + [kubernetes/client-go](https://github.com/kubernetes/client-go) + GORM + M
 ## 简介
 - Namespace 查询
 - Pod 创建、更新、删除、查询、详情
-- 
+- Node 列表、详情、Node 所包含的 Pods
+- ConfigMap 创建、更新、查询、删除
 - TODO
 
 ## 项目前端
