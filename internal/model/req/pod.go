@@ -42,21 +42,22 @@ type DnsConfig struct {
 }
 
 type Container struct {
-	Name            string          `json:"name"`
-	Image           string          `json:"image"`
-	ImagePullPolicy string          `json:"imagePullPolicy"` // Always | IfNotPresent | Never
-	Tty             bool            `json:"tty"`
-	Ports           []ContainerPort `json:"ports"`
-	WorkingDir      string          `json:"workingDir"`
-	Command         []string        `json:"command"`
-	Args            []string        `json:"args"`
-	Env             []Item          `json:"env"`
-	Privileged      bool            `json:"privileged"`    // Whether to enable privileged mode (e.g. root)
-	Resources       Resource        `json:"resources"`     // Container application quota
-	VolumeMounts    []VolumeMount   `json:"volumeMounts"`  // Mounted volumes
-	StartUpProbe    ContainerProbe  `json:"startUpProbe"`  // Start the probe
-	LivenessProbe   ContainerProbe  `json:"livenessProbe"` // Survival probes
-	ReadinessProbe  ContainerProbe  `json:"readyProbe"`    // Readiness Probe
+	Name            string               `json:"name"`
+	Image           string               `json:"image"`
+	ImagePullPolicy string               `json:"imagePullPolicy"` // Always | IfNotPresent | Never
+	Tty             bool                 `json:"tty"`
+	Ports           []ContainerPort      `json:"ports"`
+	WorkingDir      string               `json:"workingDir"`
+	Command         []string             `json:"command"`
+	Args            []string             `json:"args"`
+	Env             []EnvVar             `json:"env"`
+	EnvsFrom        []EnvVarFromResource `json:"envsFrom"`
+	Privileged      bool                 `json:"privileged"`    // Whether to enable privileged mode (e.g. root)
+	Resources       Resource             `json:"resources"`     // Container application quota
+	VolumeMounts    []VolumeMount        `json:"volumeMounts"`  // Mounted volumes
+	StartUpProbe    ContainerProbe       `json:"startUpProbe"`  // Start the probe
+	LivenessProbe   ContainerProbe       `json:"livenessProbe"` // Survival probes
+	ReadinessProbe  ContainerProbe       `json:"readyProbe"`    // Readiness Probe
 }
 
 type ContainerPort struct {
@@ -125,4 +126,17 @@ type NodeAffinityTermExpressions struct {
 	Key      string                      `json:"key"`
 	Value    string                      `json:"value"`
 	Operator corev1.NodeSelectorOperator `json:"operator"`
+}
+
+type EnvVar struct {
+	Name    string `json:"name"`
+	RefName string `json:"refName"`
+	Value   string `json:"value"`
+	Type    string `json:"type"` // configMap | secret | default(k/v)
+}
+
+type EnvVarFromResource struct {
+	Name    string `json:"name"`
+	RefType string `json:"refType"` // configMap | secret
+	Prefix  string `json:"prefix"`
 }

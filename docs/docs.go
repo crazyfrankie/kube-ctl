@@ -1016,7 +1016,13 @@ const docTemplate = `{
                 "env": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVar"
+                    }
+                },
+                "envsFrom": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVarFromResource"
                     }
                 },
                 "image": {
@@ -1150,6 +1156,39 @@ const docTemplate = `{
                     "items": {
                         "type": "string"
                     }
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVar": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "refName": {
+                    "type": "string"
+                },
+                "type": {
+                    "description": "configMap | secret | default(k/v)",
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVarFromResource": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "prefix": {
+                    "type": "string"
+                },
+                "refType": {
+                    "description": "configMap | secret",
+                    "type": "string"
                 }
             }
         },

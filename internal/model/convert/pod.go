@@ -25,6 +25,9 @@ const (
 	ScheduleNodeSelector = "nodeSelector"
 	ScheduleNodeAffinity = "nodeAffinity"
 	ScheduleNodeAny      = "nodeAny"
+
+	RefConfigMap = "configMap"
+	RefSecret    = "secret"
 )
 
 // PodReqConvert convert req.Pod to corev1.Pod
@@ -97,7 +100,8 @@ func getPodContainers(cs []req.Container) []corev1.Container {
 			WorkingDir:      c.WorkingDir,
 			TTY:             c.Tty,
 			Ports:           getPodPorts(c.Ports),
-			Env:             getPodEnv(c.Env),
+			Env:             getPodEnvVar(c.Env),
+			EnvFrom:         getPodEnvVarFrom(c.EnvsFrom),
 			ImagePullPolicy: corev1.PullPolicy(c.ImagePullPolicy),
 			SecurityContext: &corev1.SecurityContext{
 				Privileged: &c.Privileged,
@@ -126,13 +130,49 @@ func getPodPorts(ports []req.ContainerPort) []corev1.ContainerPort {
 	return res
 }
 
-func getPodEnv(items []req.Item) []corev1.EnvVar {
+func getPodEnvVar(items []req.EnvVar) []corev1.EnvVar {
 	envs := make([]corev1.EnvVar, 0, len(items))
 	for _, i := range items {
-		envs = append(envs, corev1.EnvVar{
-			Name:  i.Key,
-			Value: i.Value,
-		})
+		env := corev1.EnvVar{Name: i.Name}
+		switch i.Type {
+		case RefConfigMap:
+			env.ValueFrom = &corev1.EnvVarSource{
+				ConfigMapKeyRef: &corev1.ConfigMapKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: i.RefName},
+					Key:                  i.Value,
+				},
+			}
+		case RefSecret:
+			env.ValueFrom = &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{Name: i.RefName},
+					Key:                  i.Value,
+				},
+			}
+		default:
+			env.Value = i.Value
+		}
+		envs = append(envs)
+	}
+
+	return envs
+}
+
+func getPodEnvVarFrom(items []req.EnvVarFromResource) []corev1.EnvFromSource {
+	envs := make([]corev1.EnvFromSource, 0, len(items))
+	for _, i := range items {
+		env := corev1.EnvFromSource{Prefix: i.Prefix}
+		switch i.RefType {
+		case RefConfigMap:
+			env.ConfigMapRef = &corev1.ConfigMapEnvSource{
+				LocalObjectReference: corev1.LocalObjectReference{Name: i.Name},
+			}
+		case RefSecret:
+			env.SecretRef = &corev1.SecretEnvSource{
+				LocalObjectReference: corev1.LocalObjectReference{Name: i.Name},
+			}
+		}
+		envs = append(envs, env)
 	}
 
 	return envs
@@ -366,6 +406,7 @@ func getReqContainers(containers []corev1.Container, volumeMap map[string]string
 			Command:         c.Command,
 			Args:            c.Args,
 			Env:             getReqContainerEnv(c.Env),
+			EnvsFrom:        getReqContainerEnvVarFrom(c.EnvFrom),
 			Privileged:      privileged,
 			Resources:       getReqContainerResource(&c.Resources),
 			VolumeMounts:    getReqContainerVolumeMount(c.VolumeMounts, volumeMap),
@@ -391,13 +432,44 @@ func getReqContainerPort(ports []corev1.ContainerPort) []req.ContainerPort {
 	return res
 }
 
-func getReqContainerEnv(envs []corev1.EnvVar) []req.Item {
-	res := make([]req.Item, 0, len(envs))
+func getReqContainerEnv(envs []corev1.EnvVar) []req.EnvVar {
+	res := make([]req.EnvVar, 0, len(envs))
 	for _, i := range envs {
-		res = append(res, req.Item{
-			Key:   i.Name,
-			Value: i.Value,
-		})
+		env := req.EnvVar{Name: i.Name}
+		if i.ValueFrom != nil {
+			if i.ValueFrom.ConfigMapKeyRef != nil {
+				env.RefName = i.ValueFrom.ConfigMapKeyRef.LocalObjectReference.Name
+				env.Value = i.ValueFrom.ConfigMapKeyRef.Key
+				env.Type = RefConfigMap
+			}
+			if i.ValueFrom.SecretKeyRef != nil {
+				env.RefName = i.ValueFrom.SecretKeyRef.LocalObjectReference.Name
+				env.Value = i.ValueFrom.SecretKeyRef.Key
+				env.Type = RefSecret
+			}
+		} else {
+			env.Value = i.Value
+		}
+
+		res = append(res, env)
+	}
+
+	return res
+}
+
+func getReqContainerEnvVarFrom(envs []corev1.EnvFromSource) []req.EnvVarFromResource {
+	res := make([]req.EnvVarFromResource, 0, len(envs))
+	for _, i := range envs {
+		env := req.EnvVarFromResource{Prefix: i.Prefix}
+		if i.ConfigMapRef != nil {
+			env.RefType = RefConfigMap
+			env.Name = i.ConfigMapRef.Name
+		}
+		if i.SecretRef != nil {
+			env.RefType = RefSecret
+			env.Name = i.SecretRef.Name
+		}
+		res = append(res, env)
 	}
 
 	return res
