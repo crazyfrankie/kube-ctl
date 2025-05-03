@@ -38,12 +38,13 @@ func InitMws() []gin.HandlerFunc {
 	}
 }
 
-func InitGin(pod *k8s.PodHandler, node *k8s.NodeHandler, configmap *k8s.ConfigMapHandler, mws []gin.HandlerFunc) *gin.Engine {
+func InitGin(pod *k8s.PodHandler, node *k8s.NodeHandler, configmap *k8s.ConfigMapHandler, secret *k8s.SecretHandler, mws []gin.HandlerFunc) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 	pod.RegisterRoute(srv)
 	node.RegisterRoute(srv)
 	configmap.RegisterRoute(srv)
+	secret.RegisterRoute(srv)
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
 	docs.SwaggerInfo.BasePath = "/api"
@@ -59,9 +60,11 @@ func InitServer() *gin.Engine {
 		service.NewPodService,
 		service.NewNodeService,
 		service.NewConfigMapService,
+		service.NewSecretService,
 		k8s.NewPodHandler,
 		k8s.NewNodeHandler,
 		k8s.NewConfigMapHandler,
+		k8s.NewSecretHandler,
 
 		InitGin,
 	)

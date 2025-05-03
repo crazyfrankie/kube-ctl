@@ -252,6 +252,25 @@ definitions:
       memoryLimit:
         type: integer
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Secret:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/v1.SecretType'
+        description: Opaque | kubernetes.io/dockerconfigjson
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq:
     properties:
       labels:
@@ -409,6 +428,40 @@ definitions:
         description: Running | Error
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.Secret:
+    properties:
+      age:
+        type: integer
+      dataNum:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      type:
+        $ref: '#/definitions/v1.SecretType'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.SecretDetail:
+    properties:
+      age:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item'
+        type: array
+      dataNum:
+        type: integer
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      type:
+        $ref: '#/definitions/v1.SecretType'
+    type: object
   github_com_crazyfrankie_kube-ctl_pkg_response.Response:
     properties:
       code:
@@ -433,6 +486,26 @@ definitions:
     - NodeSelectorOpDoesNotExist
     - NodeSelectorOpGt
     - NodeSelectorOpLt
+  v1.SecretType:
+    enum:
+    - Opaque
+    - kubernetes.io/service-account-token
+    - kubernetes.io/dockercfg
+    - kubernetes.io/dockerconfigjson
+    - kubernetes.io/basic-auth
+    - kubernetes.io/ssh-auth
+    - kubernetes.io/tls
+    - bootstrap.kubernetes.io/token
+    type: string
+    x-enum-varnames:
+    - SecretTypeOpaque
+    - SecretTypeServiceAccountToken
+    - SecretTypeDockercfg
+    - SecretTypeDockerConfigJson
+    - SecretTypeBasicAuth
+    - SecretTypeSSHAuth
+    - SecretTypeTLS
+    - SecretTypeBootstrapToken
   v1.Taint:
     properties:
       effect:
@@ -980,4 +1053,129 @@ paths:
       summary: 搜索Pod
       tags:
       - Pod管理
+  /api/secret:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定命名空间下的指定Secret
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Secret名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除Secret
+      tags:
+      - Secret管理
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Secret的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Secret名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Secret的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.SecretDetail'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Secret详情
+      tags:
+      - Secret管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 Secret 或更新已存在的 Secret
+      parameters:
+      - description: Secret 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Secret'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 Secret
+      tags:
+      - Secret管理
+  /api/secret/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下的所有Secret列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Secret列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Secret'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Secret列表
+      tags:
+      - Secret管理
 swagger: "2.0"
