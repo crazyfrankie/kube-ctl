@@ -77,7 +77,7 @@ func (h *ConfigMapHandler) GetConfigMap() gin.HandlerFunc {
 		ns := c.Query("namespace")
 		name := c.Query("name")
 
-		res, err := h.svc.GetConfigMap(context.Background(), ns, name)
+		res, err := h.svc.GetConfigMap(context.Background(), name, ns)
 		if err != nil {
 			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return

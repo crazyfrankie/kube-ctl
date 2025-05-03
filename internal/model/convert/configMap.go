@@ -35,7 +35,7 @@ func CMConvertListResp(cm *corev1.ConfigMap) resp.ConfigMap {
 		Name:      cm.Name,
 		Namespace: cm.Namespace,
 		DataNum:   len(cm.Data),
-		Age:       time.Now().Sub(cm.CreationTimestamp.Time).Milliseconds(),
+		Age:       int64(time.Now().Sub(cm.CreationTimestamp.Time).Seconds()),
 	}
 }
 
@@ -59,7 +59,7 @@ func CMConvertDetailResp(cm *corev1.ConfigMap) resp.ConfigMapDetail {
 		Name:      cm.Name,
 		Namespace: cm.Namespace,
 		DataNum:   len(cm.Data),
-		Age:       time.Now().Sub(cm.CreationTimestamp.Time).Milliseconds(),
+		Age:       int64(time.Now().Sub(cm.CreationTimestamp.Time).Seconds()),
 		Data:      data,
 		Labels:    labels,
 	}
