@@ -853,6 +853,104 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/pvc": {
+            "get": {
+                "description": "获取所有 PersistentVolumeClaim 存储声明信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PVC 管理"
+                ],
+                "summary": "获取 PVC 列表",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeClaim"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建一个 PersistentVolumeClaim 声明用户的存储需求",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PVC 管理"
+                ],
+                "summary": "创建 PVC",
+                "responses": {
+                    "200": {
+                        "description": "创建 PVC 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 PersistentVolumeClaim 存储声明",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PVC 管理"
+                ],
+                "summary": "删除 PVC",
+                "responses": {
+                    "200": {
+                        "description": "删除 PVC 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/secret": {
             "get": {
                 "description": "获取指定命名空间下指定Secret的详细信息",
@@ -1713,6 +1811,39 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeClaim": {
+            "type": "object",
+            "properties": {
+                "accessModes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.PersistentVolumeAccessMode"
+                    }
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "capacity": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "status": {
+                    "$ref": "#/definitions/v1.PersistentVolumeClaimPhase"
+                },
+                "volume": {
+                    "description": "PV name",
+                    "type": "string"
+                },
+                "volumeAttributeClass": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeItem": {
             "type": "object",
             "properties": {
@@ -1886,6 +2017,19 @@ const docTemplate = `{
                 "ReadOnlyMany",
                 "ReadWriteMany",
                 "ReadWriteOncePod"
+            ]
+        },
+        "v1.PersistentVolumeClaimPhase": {
+            "type": "string",
+            "enum": [
+                "Pending",
+                "Bound",
+                "Lost"
+            ],
+            "x-enum-varnames": [
+                "ClaimPending",
+                "ClaimBound",
+                "ClaimLost"
             ]
         },
         "v1.PersistentVolumePhase": {

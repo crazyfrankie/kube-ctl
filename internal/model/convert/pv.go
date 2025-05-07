@@ -1,8 +1,6 @@
 package convert
 
 import (
-	"strconv"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -21,9 +19,9 @@ func PVReqConvert(req *req.PersistentVolume) *corev1.PersistentVolume {
 	switch req.VolumeSource.Type {
 	case VolumeTypeNFS:
 		volumeSource.NFS = &corev1.NFSVolumeSource{
-			Server:   req.VolumeSource.NFSVolumeSource.NfsServer,
-			Path:     req.VolumeSource.NFSVolumeSource.NfsPath,
-			ReadOnly: req.VolumeSource.NFSVolumeSource.ReadOnly,
+			Server:   req.VolumeSource.NFS.NfsServer,
+			Path:     req.VolumeSource.NFS.NfsPath,
+			ReadOnly: req.VolumeSource.NFS.ReadOnly,
 		}
 		// TODO other type
 	default:
@@ -38,7 +36,7 @@ func PVReqConvert(req *req.PersistentVolume) *corev1.PersistentVolume {
 		Spec: corev1.PersistentVolumeSpec{
 			AccessModes: req.AccessModes,
 			Capacity: map[corev1.ResourceName]resource.Quantity{
-				corev1.ResourceStorage: resource.MustParse(strconv.Itoa(req.Capacity) + "Mi"),
+				corev1.ResourceStorage: resource.MustParse(req.Capacity),
 			},
 			PersistentVolumeReclaimPolicy: req.ReclaimPolicy,
 			PersistentVolumeSource:        volumeSource,
@@ -47,11 +45,11 @@ func PVReqConvert(req *req.PersistentVolume) *corev1.PersistentVolume {
 }
 
 func PVConvertResp(pv *corev1.PersistentVolume) resp.PersistentVolumeItem {
-	var attriName, claim string
+	var attributeName, claim string
 	if pv.Spec.VolumeAttributesClassName != nil {
-		attriName = *pv.Spec.VolumeAttributesClassName
+		attributeName = *pv.Spec.VolumeAttributesClassName
 	} else {
-		attriName = "<unset>"
+		attributeName = "<unset>"
 	}
 	if pv.Spec.ClaimRef != nil {
 		claim = pv.Spec.ClaimRef.Name
@@ -65,7 +63,7 @@ func PVConvertResp(pv *corev1.PersistentVolume) resp.PersistentVolumeItem {
 		Status:               pv.Status.Phase,
 		Claim:                claim,
 		StorageClass:         pv.Spec.StorageClassName,
-		VolumeAttributeClass: attriName,
+		VolumeAttributeClass: attributeName,
 		Reason:               pv.Status.Reason,
 		Age:                  pv.CreationTimestamp.Time.Unix(),
 	}

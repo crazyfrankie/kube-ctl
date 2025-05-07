@@ -1,8 +1,6 @@
 package convert
 
 import (
-	"strconv"
-
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -22,7 +20,7 @@ func PVCReqConvert(req *req.PersistentVolumeClaim) *corev1.PersistentVolumeClaim
 		Spec: corev1.PersistentVolumeClaimSpec{
 			Resources: corev1.VolumeResourceRequirements{
 				Requests: corev1.ResourceList{
-					corev1.ResourceStorage: resource.MustParse(strconv.Itoa(req.Capacity) + "Mi"),
+					corev1.ResourceStorage: resource.MustParse(req.Capacity),
 				},
 			},
 			AccessModes: req.AccessModes,
@@ -35,12 +33,13 @@ func PVCReqConvert(req *req.PersistentVolumeClaim) *corev1.PersistentVolumeClaim
 }
 
 func PVCRespConvert(pvc *corev1.PersistentVolumeClaim) resp.PersistentVolumeClaim {
-	var attriName string
+	var attributeName string
 	if pvc.Spec.VolumeAttributesClassName != nil {
-		attriName = *pvc.Spec.VolumeAttributesClassName
+		attributeName = *pvc.Spec.VolumeAttributesClassName
 	} else {
-		attriName = "<unset>"
+		attributeName = "<unset>"
 	}
+
 	return resp.PersistentVolumeClaim{
 		Name:                 pvc.Name,
 		Namespace:            pvc.Namespace,
@@ -48,7 +47,7 @@ func PVCRespConvert(pvc *corev1.PersistentVolumeClaim) resp.PersistentVolumeClai
 		Volume:               pvc.Spec.VolumeName,
 		Capacity:             pvc.Spec.Resources.Requests.Storage().String(),
 		AccessModes:          pvc.Spec.AccessModes,
-		VolumeAttributeClass: attriName,
+		VolumeAttributeClass: attributeName,
 		Age:                  pvc.CreationTimestamp.Unix(),
 	}
 }

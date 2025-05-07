@@ -31,6 +31,15 @@ func (h *PVCHandler) RegisterRoute(r *gin.Engine) {
 	}
 }
 
+// CreatePVC
+// @Summary 创建 PVC
+// @Description 创建一个 PersistentVolumeClaim 声明用户的存储需求
+// @Tags PVC 管理
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response "创建 PVC 成功"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
+// @Router /api/pvc [post]
 func (h *PVCHandler) CreatePVC() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var createReq req.PersistentVolumeClaim
@@ -49,6 +58,15 @@ func (h *PVCHandler) CreatePVC() gin.HandlerFunc {
 	}
 }
 
+// DeletePVC
+// @Summary 删除 PVC
+// @Description 删除一个 PersistentVolumeClaim 存储声明
+// @Tags PVC 管理
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response "删除 PVC 成功"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
+// @Router /api/pvc [delete]
 func (h *PVCHandler) DeletePVC() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Query("name")
@@ -64,6 +82,15 @@ func (h *PVCHandler) DeletePVC() gin.HandlerFunc {
 	}
 }
 
+// GetPVCList
+// @Summary 获取 PVC 列表
+// @Description 获取所有 PersistentVolumeClaim 存储声明信息
+// @Tags PVC 管理
+// @Accept json
+// @Produce json
+// @Success 200 {object} response.Response{data=[]resp.PersistentVolumeClaim} "获取成功"
+// @Failure 500 {object} response.Response "系统错误(code=30000)"
+// @Router /api/pvc [get]
 func (h *PVCHandler) GetPVCList() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ns := c.Query("namespace")
