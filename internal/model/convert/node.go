@@ -4,6 +4,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 
 func NodeListItemConvertResp(node corev1.Node) resp.NodeListItem {
@@ -51,19 +52,7 @@ func NodeDetailConvertResp(node *corev1.Node) resp.NodeDetail {
 		Status:           getNodeStatus(node.Status.Conditions, corev1.NodeReady, corev1.ConditionTrue),
 		InternalIP:       getNodeIP(node.Status.Addresses, corev1.NodeInternalIP),
 		ExternalIP:       getNodeIP(node.Status.Addresses, corev1.NodeExternalIP),
-		Labels:           getNodeDetailLabels(node.Labels),
+		Labels:           utils.ResMapToItem(node.Labels),
 		Taints:           node.Spec.Taints,
 	}
-}
-
-func getNodeDetailLabels(labels map[string]string) []resp.Item {
-	res := make([]resp.Item, 0, len(labels))
-	for k, v := range labels {
-		res = append(res, resp.Item{
-			Key:   k,
-			Value: v,
-		})
-	}
-
-	return res
 }

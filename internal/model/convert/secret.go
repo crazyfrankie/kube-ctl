@@ -10,13 +10,10 @@ import (
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 
 func SecretReqConvert(req *req.Secret) *corev1.Secret {
-	labels := make(map[string]string)
-	for _, i := range req.Labels {
-		labels[i.Key] = i.Value
-	}
 	data := make(map[string]string)
 	for _, i := range req.Data {
 		val := base64.StdEncoding.EncodeToString(unsafeToBytes(i.Value))
@@ -26,7 +23,7 @@ func SecretReqConvert(req *req.Secret) *corev1.Secret {
 		ObjectMeta: metav1.ObjectMeta{
 			Name:              req.Name,
 			Namespace:         req.Namespace,
-			Labels:            labels,
+			Labels:            utils.ReqItemToMap(req.Labels),
 			CreationTimestamp: metav1.Time{Time: time.Now()},
 		},
 		StringData: data,
@@ -53,27 +50,13 @@ func SecretConvertListResp(s *corev1.Secret) resp.Secret {
 }
 
 func SecretConvertDetailResp(s *corev1.Secret) resp.SecretDetail {
-	labels := make([]resp.Item, 0, len(s.Labels))
-	for k, v := range s.Labels {
-		labels = append(labels, resp.Item{
-			Key:   k,
-			Value: v,
-		})
-	}
-	data := make([]resp.Item, 0, len(s.Data))
-	for k, v := range s.Labels {
-		data = append(data, resp.Item{
-			Key:   k,
-			Value: v,
-		})
-	}
 	return resp.SecretDetail{
 		Name:      s.Name,
 		Namespace: s.Namespace,
 		DataNum:   len(s.Data),
 		Age:       s.CreationTimestamp.Time.Unix(),
 		Type:      s.Type,
-		Labels:    labels,
-		Data:      data,
+		Labels:    utils.ResMapToItem(s.Labels),
+		Data:      utils.ResMapToItem(s.StringData),
 	}
 }

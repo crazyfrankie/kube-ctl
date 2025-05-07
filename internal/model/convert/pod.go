@@ -12,6 +12,7 @@ import (
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 
 const (
@@ -40,7 +41,7 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 			Name:              req.Base.Name,
 			Namespace:         req.Base.Namespace,
 			CreationTimestamp: metav1.Time{Time: time.Now()},
-			Labels:            getPodLabels(req.Base.Labels),
+			Labels:            utils.ReqItemToMap(req.Base.Labels),
 		},
 		Spec: corev1.PodSpec{
 			Tolerations:    req.Tolerations,
@@ -59,15 +60,6 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 			Affinity:      affinity,
 		},
 	}
-}
-
-func getPodLabels(items []req.Item) map[string]string {
-	res := make(map[string]string, len(items))
-	for _, i := range items {
-		res[i.Key] = i.Value
-	}
-
-	return res
 }
 
 func getPodVolumes(vms []req.Volume) []corev1.Volume {
@@ -324,22 +316,10 @@ func PodConvertReq(pod *corev1.Pod) *req.Pod {
 func getReqBase(pod *corev1.Pod) req.Base {
 	return req.Base{
 		Name:          pod.Name,
-		Labels:        getReqLabels(pod.Labels),
+		Labels:        utils.ReqMapToItem(pod.Labels),
 		Namespace:     pod.Namespace,
 		RestartPolicy: string(pod.Spec.RestartPolicy),
 	}
-}
-
-func getReqLabels(data map[string]string) []req.Item {
-	res := make([]req.Item, 0, len(data))
-	for k, v := range data {
-		res = append(res, req.Item{
-			Key:   k,
-			Value: v,
-		})
-	}
-
-	return res
 }
 
 func getReqNetwork(pod *corev1.Pod) req.Network {
@@ -579,13 +559,7 @@ func getReqPodNodeScheduling(pod *corev1.Pod) req.NodeScheduling {
 	scheduling := req.NodeScheduling{Type: ScheduleNodeAny}
 	if pod.Spec.NodeSelector != nil {
 		scheduling.Type = ScheduleNodeSelector
-		res := make([]req.Item, 0, len(pod.Spec.NodeSelector))
-		for k, v := range pod.Spec.NodeSelector {
-			res = append(res, req.Item{
-				Key:   k,
-				Value: v,
-			})
-		}
+		res := utils.ReqMapToItem(pod.Spec.NodeSelector)
 		scheduling.NodeSelector = res
 	}
 

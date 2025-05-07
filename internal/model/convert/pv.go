@@ -1,13 +1,15 @@
 package convert
 
 import (
-	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"strconv"
+
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"strconv"
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 
 const (
@@ -15,11 +17,6 @@ const (
 )
 
 func PVReqConvert(req *req.PersistentVolume) *corev1.PersistentVolume {
-	labels := make(map[string]string)
-	for _, i := range req.Labels {
-		labels[i.Key] = i.Value
-	}
-
 	var volumeSource corev1.PersistentVolumeSource
 	switch req.VolumeSource.Type {
 	case VolumeTypeNFS:
@@ -36,7 +33,7 @@ func PVReqConvert(req *req.PersistentVolume) *corev1.PersistentVolume {
 	return &corev1.PersistentVolume{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:   req.Name,
-			Labels: labels,
+			Labels: utils.ReqItemToMap(req.Labels),
 		},
 		Spec: corev1.PersistentVolumeSpec{
 			AccessModes: req.AccessModes,
@@ -59,16 +56,9 @@ func PVConvertResp(pv *corev1.PersistentVolume) resp.PersistentVolumeItem {
 	if pv.Spec.ClaimRef != nil {
 		claim = pv.Spec.ClaimRef.Name
 	}
-	labels := make([]resp.Item, 0, len(pv.Labels))
-	for k, v := range pv.Labels {
-		labels = append(labels, resp.Item{
-			Key:   k,
-			Value: v,
-		})
-	}
 	return resp.PersistentVolumeItem{
 		Name:                 pv.Name,
-		Labels:               labels,
+		Labels:               utils.ResMapToItem(pv.Labels),
 		Capacity:             pv.Spec.Capacity.Storage().String(),
 		AccessModes:          pv.Spec.AccessModes,
 		ReclaimPolicy:        pv.Spec.PersistentVolumeReclaimPolicy,
