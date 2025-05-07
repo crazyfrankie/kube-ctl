@@ -71,7 +71,7 @@ func SecretConvertDetailResp(s *corev1.Secret) resp.SecretDetail {
 		Name:      s.Name,
 		Namespace: s.Namespace,
 		DataNum:   len(s.Data),
-		Age:       int64(time.Now().Sub(s.CreationTimestamp.Time).Seconds()),
+		Age:       s.CreationTimestamp.Time.Unix(),
 		Type:      s.Type,
 		Labels:    labels,
 		Data:      data,

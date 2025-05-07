@@ -431,6 +431,36 @@ definitions:
         description: kubelet version
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeItem:
+    properties:
+      accessModes:
+        items:
+          $ref: '#/definitions/v1.PersistentVolumeAccessMode'
+        type: array
+      age:
+        type: integer
+      capacity:
+        type: string
+      claim:
+        description: bind for pvc
+        type: string
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item'
+        type: array
+      name:
+        type: string
+      reason:
+        type: string
+      reclaimPolicy:
+        $ref: '#/definitions/v1.PersistentVolumeReclaimPolicy'
+      status:
+        $ref: '#/definitions/v1.PersistentVolumePhase'
+      storageClass:
+        type: string
+      volumeAttributeClass:
+        type: string
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem:
     properties:
       age:
@@ -512,6 +542,42 @@ definitions:
     - NodeSelectorOpDoesNotExist
     - NodeSelectorOpGt
     - NodeSelectorOpLt
+  v1.PersistentVolumeAccessMode:
+    enum:
+    - ReadWriteOnce
+    - ReadOnlyMany
+    - ReadWriteMany
+    - ReadWriteOncePod
+    type: string
+    x-enum-varnames:
+    - ReadWriteOnce
+    - ReadOnlyMany
+    - ReadWriteMany
+    - ReadWriteOncePod
+  v1.PersistentVolumePhase:
+    enum:
+    - Pending
+    - Available
+    - Bound
+    - Released
+    - Failed
+    type: string
+    x-enum-varnames:
+    - VolumePending
+    - VolumeAvailable
+    - VolumeBound
+    - VolumeReleased
+    - VolumeFailed
+  v1.PersistentVolumeReclaimPolicy:
+    enum:
+    - Recycle
+    - Delete
+    - Retain
+    type: string
+    x-enum-varnames:
+    - PersistentVolumeReclaimRecycle
+    - PersistentVolumeReclaimDelete
+    - PersistentVolumeReclaimRetain
   v1.SecretType:
     enum:
     - Opaque
@@ -1079,6 +1145,68 @@ paths:
       summary: 搜索Pod
       tags:
       - Pod管理
+  /api/pv:
+    delete:
+      consumes:
+      - application/json
+      description: 删除一个 PersistentVolume 存储空间
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 PV 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 PV
+      tags:
+      - PV 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取所有 PersistentVolume 存储空间的信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeItem'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 PV 列表
+      tags:
+      - PV 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建一个 PersistentVolume 存储空间
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 PV 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建 PV
+      tags:
+      - PV 管理
   /api/secret:
     delete:
       consumes:

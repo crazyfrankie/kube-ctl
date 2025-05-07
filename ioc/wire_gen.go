@@ -21,6 +21,7 @@ import (
 // Injectors from wire.go:
 
 func InitServer() *gin.Engine {
+	v := InitMws()
 	clientset := InitKubernetes()
 	podService := service.NewPodService(clientset)
 	podHandler := k8s.NewPodHandler(podService)
@@ -30,8 +31,9 @@ func InitServer() *gin.Engine {
 	configMapHandler := k8s.NewConfigMapHandler(configMapService)
 	secretService := service.NewSecretService(clientset)
 	secretHandler := k8s.NewSecretHandler(secretService)
-	v := InitMws()
-	engine := InitGin(podHandler, nodeHandler, configMapHandler, secretHandler, v)
+	pvService := service.NewPVService(clientset)
+	pvHandler := k8s.NewPVHandler(pvService)
+	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler)
 	return engine
 }
 
@@ -57,13 +59,17 @@ func InitMws() []gin.HandlerFunc {
 	return []gin.HandlerFunc{mw.CORS()}
 }
 
-func InitGin(pod *k8s.PodHandler, node *k8s.NodeHandler, configmap *k8s.ConfigMapHandler, secret *k8s.SecretHandler, mws []gin.HandlerFunc) *gin.Engine {
+func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
+	configmap *k8s.ConfigMapHandler, secret *k8s.SecretHandler, pv *k8s.PVHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
+
 	pod.RegisterRoute(srv)
 	node.RegisterRoute(srv)
 	configmap.RegisterRoute(srv)
 	secret.RegisterRoute(srv)
+	pv.RegisterRoute(srv)
+
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	docs.SwaggerInfo.
 		BasePath = "/api"

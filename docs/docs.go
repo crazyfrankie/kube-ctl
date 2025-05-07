@@ -755,6 +755,104 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/pv": {
+            "get": {
+                "description": "获取所有 PersistentVolume 存储空间的信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PV 管理"
+                ],
+                "summary": "获取 PV 列表",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeItem"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建一个 PersistentVolume 存储空间",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PV 管理"
+                ],
+                "summary": "创建 PV",
+                "responses": {
+                    "200": {
+                        "description": "创建 PV 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 PersistentVolume 存储空间",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PV 管理"
+                ],
+                "summary": "删除 PV",
+                "responses": {
+                    "200": {
+                        "description": "删除 PV 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/secret": {
             "get": {
                 "description": "获取指定命名空间下指定Secret的详细信息",
@@ -1615,6 +1713,51 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.PersistentVolumeItem": {
+            "type": "object",
+            "properties": {
+                "accessModes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.PersistentVolumeAccessMode"
+                    }
+                },
+                "age": {
+                    "type": "integer"
+                },
+                "capacity": {
+                    "type": "string"
+                },
+                "claim": {
+                    "description": "bind for pvc",
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "reclaimPolicy": {
+                    "$ref": "#/definitions/v1.PersistentVolumeReclaimPolicy"
+                },
+                "status": {
+                    "$ref": "#/definitions/v1.PersistentVolumePhase"
+                },
+                "storageClass": {
+                    "type": "string"
+                },
+                "volumeAttributeClass": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_resp.PodListItem": {
             "type": "object",
             "properties": {
@@ -1728,6 +1871,51 @@ const docTemplate = `{
                 "NodeSelectorOpDoesNotExist",
                 "NodeSelectorOpGt",
                 "NodeSelectorOpLt"
+            ]
+        },
+        "v1.PersistentVolumeAccessMode": {
+            "type": "string",
+            "enum": [
+                "ReadWriteOnce",
+                "ReadOnlyMany",
+                "ReadWriteMany",
+                "ReadWriteOncePod"
+            ],
+            "x-enum-varnames": [
+                "ReadWriteOnce",
+                "ReadOnlyMany",
+                "ReadWriteMany",
+                "ReadWriteOncePod"
+            ]
+        },
+        "v1.PersistentVolumePhase": {
+            "type": "string",
+            "enum": [
+                "Pending",
+                "Available",
+                "Bound",
+                "Released",
+                "Failed"
+            ],
+            "x-enum-varnames": [
+                "VolumePending",
+                "VolumeAvailable",
+                "VolumeBound",
+                "VolumeReleased",
+                "VolumeFailed"
+            ]
+        },
+        "v1.PersistentVolumeReclaimPolicy": {
+            "type": "string",
+            "enum": [
+                "Recycle",
+                "Delete",
+                "Retain"
+            ],
+            "x-enum-varnames": [
+                "PersistentVolumeReclaimRecycle",
+                "PersistentVolumeReclaimDelete",
+                "PersistentVolumeReclaimRetain"
             ]
         },
         "v1.SecretType": {
