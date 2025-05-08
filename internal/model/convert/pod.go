@@ -397,10 +397,11 @@ func getReqVolume(volumes []corev1.Volume) ([]req.Volume, map[string]string) {
 	res := make([]req.Volume, 0, len(volumes))
 	volumeMap := make(map[string]string)
 	for _, v := range volumes {
-		var volume req.Volume
+		volume := req.Volume{
+			Name: v.Name,
+		}
 		if v.EmptyDir != nil {
 			volume.Type = EMPTYDIRVolume
-			volume.Name = v.Name
 		}
 		if v.ConfigMap != nil {
 			volume.Type = ConfigMapVolume
