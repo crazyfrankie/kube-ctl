@@ -2,7 +2,6 @@ package k8s
 
 import (
 	"context"
-	"github.com/crazyfrankie/kube-ctl/internal/model/validate"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -11,6 +10,7 @@ import (
 	"github.com/crazyfrankie/kube-ctl/internal/model/convert"
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
+	"github.com/crazyfrankie/kube-ctl/internal/model/validate"
 	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"github.com/crazyfrankie/kube-ctl/pkg/response"
 )
