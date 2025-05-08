@@ -1359,6 +1359,17 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ConfigMapRefVolume": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "optional": {
+                    "type": "boolean"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Container": {
             "type": "object",
             "properties": {
@@ -1520,6 +1531,29 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolume": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolumeItem"
+                    }
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolumeItem": {
+            "type": "object",
+            "properties": {
+                "fieldPath": {
+                    "type": "string"
+                },
+                "path": {
+                    "description": "pod internal path",
+                    "type": "string"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVar": {
             "type": "object",
             "properties": {
@@ -1550,6 +1584,18 @@
                 "refType": {
                     "description": "configMap | secret",
                     "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.HostPathVolume": {
+            "type": "object",
+            "properties": {
+                "path": {
+                    "description": "host path",
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/v1.HostPathType"
                 }
             }
         },
@@ -1635,6 +1681,14 @@
                 },
                 "type": {
                     "description": "nodeName | nodeSelector | nodeAffinity",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.PVCVolume": {
+            "type": "object",
+            "properties": {
+                "claimName": {
                     "type": "string"
                 }
             }
@@ -1850,6 +1904,17 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.SecretRefVolume": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "optional": {
+                    "type": "boolean"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass": {
             "type": "object",
             "properties": {
@@ -1928,10 +1993,26 @@
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Volume": {
             "type": "object",
             "properties": {
+                "PVCVolume": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PVCVolume"
+                },
+                "configMapRefVolume": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ConfigMapRefVolume"
+                },
+                "downwardAPIVolume": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolume"
+                },
+                "hostPathVolume": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.HostPathVolume"
+                },
                 "name": {
                     "type": "string"
                 },
+                "secretRefVolume": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.SecretRefVolume"
+                },
                 "type": {
+                    "description": "emptyDir | configMap | secret | hostPath | downward | pvc",
                     "type": "string"
                 }
             }
@@ -2326,6 +2407,29 @@
                     "type": "string"
                 }
             }
+        },
+        "v1.HostPathType": {
+            "type": "string",
+            "enum": [
+                "",
+                "DirectoryOrCreate",
+                "Directory",
+                "FileOrCreate",
+                "File",
+                "Socket",
+                "CharDevice",
+                "BlockDevice"
+            ],
+            "x-enum-varnames": [
+                "HostPathUnset",
+                "HostPathDirectoryOrCreate",
+                "HostPathDirectory",
+                "HostPathFileOrCreate",
+                "HostPathFile",
+                "HostPathSocket",
+                "HostPathCharDev",
+                "HostPathBlockDev"
+            ]
         },
         "v1.NodeSelectorOperator": {
             "type": "string",

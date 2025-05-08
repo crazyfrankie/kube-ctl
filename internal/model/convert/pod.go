@@ -20,7 +20,12 @@ const (
 	TCPProbe  = "tcp"
 	EXECProbe = "exec"
 
-	EMPTYDIR = "emptyDir"
+	EMPTYDIRVolume    = "emptyDir"
+	ConfigMapVolume   = "configMap"
+	SecretVolume      = "secret"
+	HostPathVolume    = "hostPath"
+	DownwardAPIVolume = "downwardAPI"
+	PVCVolume         = "pvc"
 
 	ScheduleNodeName     = "nodeName"
 	ScheduleNodeSelector = "nodeSelector"
@@ -65,12 +70,48 @@ func PodReqConvert(req *req.Pod) *corev1.Pod {
 func getPodVolumes(vms []req.Volume) []corev1.Volume {
 	res := make([]corev1.Volume, 0, len(vms))
 	for _, i := range vms {
-		if i.Type != EMPTYDIR {
+		var source corev1.VolumeSource
+
+		switch i.Type {
+		case EMPTYDIRVolume:
+			source.EmptyDir = &corev1.EmptyDirVolumeSource{}
+		case ConfigMapVolume:
+			source.ConfigMap = &corev1.ConfigMapVolumeSource{
+				LocalObjectReference: corev1.LocalObjectReference{Name: i.ConfigMapRefVolume.Name},
+				Optional:             &i.ConfigMapRefVolume.Optional,
+			}
+		case SecretVolume:
+			source.Secret = &corev1.SecretVolumeSource{
+				SecretName: i.SecretRefVolume.Name,
+				Optional:   &i.SecretRefVolume.Optional,
+			}
+		case HostPathVolume:
+			source.HostPath = &corev1.HostPathVolumeSource{
+				Path: i.HostPathVolume.Path,
+				Type: &i.HostPathVolume.Type,
+			}
+		case DownwardAPIVolume:
+			items := make([]corev1.DownwardAPIVolumeFile, 0, len(i.DownwardAPIVolume.Items))
+			for _, i := range i.DownwardAPIVolume.Items {
+				items = append(items, corev1.DownwardAPIVolumeFile{
+					// pod internal path
+					Path: i.Path,
+					FieldRef: &corev1.ObjectFieldSelector{
+						FieldPath: i.FieldPath,
+					},
+				})
+			}
+			source.DownwardAPI = &corev1.DownwardAPIVolumeSource{
+				Items: items,
+			}
+		case PVCVolume:
+			source.PersistentVolumeClaim = &corev1.PersistentVolumeClaimVolumeSource{
+				ClaimName: i.PVCVolume.ClaimName,
+			}
+		default:
 			continue
 		}
-		source := corev1.VolumeSource{
-			EmptyDir: &corev1.EmptyDirVolumeSource{},
-		}
+
 		res = append(res, corev1.Volume{
 			Name:         i.Name,
 			VolumeSource: source,
@@ -356,14 +397,60 @@ func getReqVolume(volumes []corev1.Volume) ([]req.Volume, map[string]string) {
 	res := make([]req.Volume, 0, len(volumes))
 	volumeMap := make(map[string]string)
 	for _, v := range volumes {
-		if v.EmptyDir == nil {
-			continue
+		var volume req.Volume
+		if v.EmptyDir != nil {
+			volume.Type = EMPTYDIRVolume
+			volume.Name = v.Name
 		}
+		if v.ConfigMap != nil {
+			volume.Type = ConfigMapVolume
+			var optional bool
+			if v.Secret.Optional != nil {
+				optional = *v.Secret.Optional
+			}
+			volume.ConfigMapRefVolume = req.ConfigMapRefVolume{
+				Name:     v.ConfigMap.Name,
+				Optional: optional,
+			}
+		}
+		if v.Secret != nil {
+			volume.Type = SecretVolume
+			var optional bool
+			if v.Secret.Optional != nil {
+				optional = *v.Secret.Optional
+			}
+			volume.SecretRefVolume = req.SecretRefVolume{
+				Name:     v.Secret.SecretName,
+				Optional: optional,
+			}
+		}
+		if v.HostPath != nil {
+			volume.Type = HostPathVolume
+			volume.HostPathVolume = req.HostPathVolume{
+				Type: *v.HostPath.Type,
+				Path: v.HostPath.Path,
+			}
+		}
+		if v.DownwardAPI != nil {
+			volume.Type = DownwardAPIVolume
+			items := make([]req.DownwardAPIVolumeItem, 0, len(v.DownwardAPI.Items))
+			for _, i := range v.DownwardAPI.Items {
+				items = append(items, req.DownwardAPIVolumeItem{
+					Path:      i.Path,
+					FieldPath: i.FieldRef.FieldPath,
+				})
+			}
+			volume.DownwardAPIVolume = req.DownwardAPIVolume{Items: items}
+		}
+		if v.PersistentVolumeClaim != nil {
+			volume.Type = PVCVolume
+			volume.PVCVolume = req.PVCVolume{
+				ClaimName: v.PersistentVolumeClaim.ClaimName,
+			}
+		}
+
 		volumeMap[v.Name] = ""
-		res = append(res, req.Volume{
-			Name: v.Name,
-			Type: EMPTYDIR,
-		})
+		res = append(res, volume)
 	}
 
 	return res, volumeMap
@@ -472,7 +559,7 @@ func getReqContainerResource(resource *corev1.ResourceRequirements) req.Resource
 func getReqContainerVolumeMount(vm []corev1.VolumeMount, volumeMap map[string]string) []req.VolumeMount {
 	res := make([]req.VolumeMount, 0, len(vm))
 	for _, i := range vm {
-		// Filter by non-emptyDir
+		// Filter by supported volume type
 		if _, ok := volumeMap[i.Name]; ok {
 			res = append(res, req.VolumeMount{
 				MountName: i.Name,

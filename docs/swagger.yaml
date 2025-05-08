@@ -28,6 +28,13 @@ definitions:
       namespace:
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.ConfigMapRefVolume:
+    properties:
+      name:
+        type: string
+      optional:
+        type: boolean
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Container:
     properties:
       args:
@@ -132,6 +139,21 @@ definitions:
           type: string
         type: array
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolume:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolumeItem'
+        type: array
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolumeItem:
+    properties:
+      fieldPath:
+        type: string
+      path:
+        description: pod internal path
+        type: string
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.EnvVar:
     properties:
       name:
@@ -153,6 +175,14 @@ definitions:
       refType:
         description: configMap | secret
         type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.HostPathVolume:
+    properties:
+      path:
+        description: host path
+        type: string
+      type:
+        $ref: '#/definitions/v1.HostPathType'
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Item:
     properties:
@@ -208,6 +238,11 @@ definitions:
         type: array
       type:
         description: nodeName | nodeSelector | nodeAffinity
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.PVCVolume:
+    properties:
+      claimName:
         type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolume:
@@ -348,6 +383,13 @@ definitions:
         - $ref: '#/definitions/v1.SecretType'
         description: Opaque | kubernetes.io/dockerconfigjson
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.SecretRefVolume:
+    properties:
+      name:
+        type: string
+      optional:
+        type: boolean
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass:
     properties:
       allowVolumeExpansion:
@@ -398,9 +440,20 @@ definitions:
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Volume:
     properties:
+      PVCVolume:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PVCVolume'
+      configMapRefVolume:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ConfigMapRefVolume'
+      downwardAPIVolume:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DownwardAPIVolume'
+      hostPathVolume:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.HostPathVolume'
       name:
         type: string
+      secretRefVolume:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.SecretRefVolume'
       type:
+        description: emptyDir | configMap | secret | hostPath | downward | pvc
         type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeMount:
@@ -663,6 +716,26 @@ definitions:
       msg:
         type: string
     type: object
+  v1.HostPathType:
+    enum:
+    - ""
+    - DirectoryOrCreate
+    - Directory
+    - FileOrCreate
+    - File
+    - Socket
+    - CharDevice
+    - BlockDevice
+    type: string
+    x-enum-varnames:
+    - HostPathUnset
+    - HostPathDirectoryOrCreate
+    - HostPathDirectory
+    - HostPathFileOrCreate
+    - HostPathFile
+    - HostPathSocket
+    - HostPathCharDev
+    - HostPathBlockDev
   v1.NodeSelectorOperator:
     enum:
     - In

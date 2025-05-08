@@ -25,8 +25,41 @@ type Item struct {
 }
 
 type Volume struct {
-	Name string `json:"name"`
-	Type string `json:"type"`
+	Name               string             `json:"name"`
+	Type               string             `json:"type"` // emptyDir | configMap | secret | hostPath | downward | pvc
+	ConfigMapRefVolume ConfigMapRefVolume `json:"configMapRefVolume"`
+	SecretRefVolume    SecretRefVolume    `json:"secretRefVolume"`
+	HostPathVolume     HostPathVolume     `json:"hostPathVolume"`
+	DownwardAPIVolume  DownwardAPIVolume  `json:"downwardAPIVolume"`
+	PVCVolume          PVCVolume          `json:"PVCVolume"`
+}
+
+type ConfigMapRefVolume struct {
+	Name     string `json:"name"`
+	Optional bool   `json:"optional"`
+}
+
+type SecretRefVolume struct {
+	Name     string `json:"name"`
+	Optional bool   `json:"optional"`
+}
+
+type HostPathVolume struct {
+	Type corev1.HostPathType `json:"type"`
+	Path string              `json:"path"` // host path
+}
+
+type DownwardAPIVolume struct {
+	Items []DownwardAPIVolumeItem `json:"items"`
+}
+
+type DownwardAPIVolumeItem struct {
+	Path      string `json:"path"` // pod internal path
+	FieldPath string `json:"fieldPath"`
+}
+
+type PVCVolume struct {
+	ClaimName string `json:"claimName"`
 }
 
 type Network struct {
