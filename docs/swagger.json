@@ -799,9 +799,26 @@
                     "PV 管理"
                 ],
                 "summary": "创建 PV",
+                "parameters": [
+                    {
+                        "description": "PV 信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolume"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "创建 PV 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20000)",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
@@ -826,6 +843,15 @@
                     "PV 管理"
                 ],
                 "summary": "删除 PV",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "PV 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "删除 PV 成功",
@@ -897,9 +923,26 @@
                     "PVC 管理"
                 ],
                 "summary": "创建 PVC",
+                "parameters": [
+                    {
+                        "description": "PVC 信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolumeClaim"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "创建 PVC 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20000)",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
@@ -924,6 +967,15 @@
                     "PVC 管理"
                 ],
                 "summary": "删除 PVC",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "PVC 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "删除 PVC 成功",
@@ -1126,6 +1178,130 @@
                                     }
                                 }
                             ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/storage": {
+            "get": {
+                "description": "获取所有 StorageClass 存储类信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "PVC 管理"
+                ],
+                "summary": "获取 StorageClass 列表",
+                "responses": {
+                    "200": {
+                        "description": "获取成功",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建一个 StorageClas 存储类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StorageClass 管理"
+                ],
+                "summary": "创建 StorageClass",
+                "parameters": [
+                    {
+                        "description": "StorageClass 信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "创建 StorageClass 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20000或20001)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 StorageClass 存储类",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "StorageClass 管理"
+                ],
+                "summary": "删除 StorageClass",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "StorageClass 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除 StorageClass 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
                     },
                     "500": {
@@ -1388,6 +1564,20 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.NFSVolumeSource": {
+            "type": "object",
+            "properties": {
+                "nfsPath": {
+                    "type": "string"
+                },
+                "nfsServer": {
+                    "type": "string"
+                },
+                "readOnly": {
+                    "type": "boolean"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Network": {
             "type": "object",
             "properties": {
@@ -1445,6 +1635,70 @@
                 },
                 "type": {
                     "description": "nodeName | nodeSelector | nodeAffinity",
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolume": {
+            "type": "object",
+            "properties": {
+                "accessModes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.PersistentVolumeAccessMode"
+                    }
+                },
+                "capacity": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "reclaimPolicy": {
+                    "$ref": "#/definitions/v1.PersistentVolumeReclaimPolicy"
+                },
+                "volumeSource": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeSource"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolumeClaim": {
+            "type": "object",
+            "properties": {
+                "accessModes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.PersistentVolumeAccessMode"
+                    }
+                },
+                "capacity": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "storageClassName": {
                     "type": "string"
                 }
             }
@@ -1596,6 +1850,53 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass": {
+            "type": "object",
+            "properties": {
+                "allowVolumeExpansion": {
+                    "description": "whether permit expand",
+                    "type": "boolean"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "mountOptions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "provisioner": {
+                    "type": "string"
+                },
+                "reclaimPolicy": {
+                    "description": "Delete | Retain",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.PersistentVolumeReclaimPolicy"
+                        }
+                    ]
+                },
+                "volumeBindingMode": {
+                    "$ref": "#/definitions/v1.VolumeBindingMode"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq": {
             "type": "object",
             "properties": {
@@ -1648,6 +1949,17 @@
                 "readOnly": {
                     "description": "Read-only or not",
                     "type": "boolean"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeSource": {
+            "type": "object",
+            "properties": {
+                "nfs": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NFSVolumeSource"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },
@@ -1962,6 +2274,47 @@
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "allowVolumeExpansion": {
+                    "type": "boolean"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item"
+                    }
+                },
+                "mountOptions": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item"
+                    }
+                },
+                "provisioner": {
+                    "type": "string"
+                },
+                "reclaimPolicy": {
+                    "$ref": "#/definitions/v1.PersistentVolumeReclaimPolicy"
+                },
+                "volumeBindingMode": {
+                    "$ref": "#/definitions/v1.VolumeBindingMode"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_pkg_response.Response": {
             "type": "object",
             "properties": {
@@ -2154,6 +2507,17 @@
             "x-enum-varnames": [
                 "TolerationOpExists",
                 "TolerationOpEqual"
+            ]
+        },
+        "v1.VolumeBindingMode": {
+            "type": "string",
+            "enum": [
+                "Immediate",
+                "WaitForFirstConsumer"
+            ],
+            "x-enum-varnames": [
+                "VolumeBindingImmediate",
+                "VolumeBindingWaitForFirstConsumer"
             ]
         }
     }

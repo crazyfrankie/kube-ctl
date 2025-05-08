@@ -37,7 +37,9 @@ func (h *PVCHandler) RegisterRoute(r *gin.Engine) {
 // @Tags PVC 管理
 // @Accept json
 // @Produce json
+// @Param pod body req.PersistentVolumeClaim true "PVC 信息"
 // @Success 200 {object} response.Response "创建 PVC 成功"
+// @Failure 400 {object} response.Response "参数错误(code=20000)"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pvc [post]
 func (h *PVCHandler) CreatePVC() gin.HandlerFunc {
@@ -64,6 +66,7 @@ func (h *PVCHandler) CreatePVC() gin.HandlerFunc {
 // @Tags PVC 管理
 // @Accept json
 // @Produce json
+// @Param name query string true "PVC 名称"
 // @Success 200 {object} response.Response "删除 PVC 成功"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pvc [delete]

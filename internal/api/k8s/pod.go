@@ -85,8 +85,7 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 			return
 		}
 
-		vd := &validate.PodValidate{}
-		err := vd.Validate(&reqPod)
+		err := validate.PodValidate(&reqPod)
 		if err != nil {
 			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20002, "validate pod err: "+err.Error()))
 			return

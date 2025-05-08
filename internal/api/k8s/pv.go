@@ -37,7 +37,9 @@ func (h *PVHandler) RegisterRoute(r *gin.Engine) {
 // @Tags PV 管理
 // @Accept json
 // @Produce json
+// @Param pod body req.PersistentVolume true "PV 信息"
 // @Success 200 {object} response.Response "创建 PV 成功"
+// @Failure 400 {object} response.Response "参数错误(code=20000)"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pv [post]
 func (h *PVHandler) CreatePV() gin.HandlerFunc {
@@ -64,6 +66,7 @@ func (h *PVHandler) CreatePV() gin.HandlerFunc {
 // @Tags PV 管理
 // @Accept json
 // @Produce json
+// @Param name query string true "PV 名称"
 // @Success 200 {object} response.Response "删除 PV 成功"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pv [delete]

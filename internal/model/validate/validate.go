@@ -3,15 +3,13 @@ package validate
 import (
 	"errors"
 	"fmt"
+	"github.com/crazyfrankie/kube-ctl/conf"
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/pkg/consts"
 )
 
-type PodValidate struct {
-}
-
-func (p *PodValidate) Validate(pod *req.Pod) error {
+func PodValidate(pod *req.Pod) error {
 	// Check sum required
 	if pod.Base.Name == "" {
 		return errors.New("pod name is necessary")
@@ -54,4 +52,15 @@ func (p *PodValidate) Validate(pod *req.Pod) error {
 	}
 
 	return nil
+}
+
+func StorageClassValidate(sc *req.StorageClass) error {
+	expectedProv := conf.GetConf().StorageClass.Provisioner
+	for _, i := range expectedProv {
+		if i == sc.Provisioner {
+			return nil
+		}
+	}
+
+	return errors.New("unsupported provisioner type")
 }

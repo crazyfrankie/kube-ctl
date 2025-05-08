@@ -14,11 +14,16 @@ var (
 )
 
 type Config struct {
-	Server Server `yaml:"server"`
+	Server       Server       `yaml:"server"`
+	StorageClass StorageClass `yaml:"storageClass"`
 }
 
 type Server struct {
 	Addr string `yaml:"addr"`
+}
+
+type StorageClass struct {
+	Provisioner []string `yaml:"provisioner"`
 }
 
 func GetConf() *Config {

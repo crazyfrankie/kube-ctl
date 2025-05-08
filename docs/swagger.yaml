@@ -161,6 +161,15 @@ definitions:
       value:
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.NFSVolumeSource:
+    properties:
+      nfsPath:
+        type: string
+      nfsServer:
+        type: string
+      readOnly:
+        type: boolean
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Network:
     properties:
       dnsConfig:
@@ -199,6 +208,48 @@ definitions:
         type: array
       type:
         description: nodeName | nodeSelector | nodeAffinity
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolume:
+    properties:
+      accessModes:
+        items:
+          $ref: '#/definitions/v1.PersistentVolumeAccessMode'
+        type: array
+      capacity:
+        type: string
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      reclaimPolicy:
+        $ref: '#/definitions/v1.PersistentVolumeReclaimPolicy'
+      volumeSource:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeSource'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolumeClaim:
+    properties:
+      accessModes:
+        items:
+          $ref: '#/definitions/v1.PersistentVolumeAccessMode'
+        type: array
+      capacity:
+        type: string
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      selector:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      storageClassName:
         type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Pod:
@@ -297,6 +348,36 @@ definitions:
         - $ref: '#/definitions/v1.SecretType'
         description: Opaque | kubernetes.io/dockerconfigjson
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass:
+    properties:
+      allowVolumeExpansion:
+        description: whether permit expand
+        type: boolean
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      mountOptions:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      parameters:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      provisioner:
+        type: string
+      reclaimPolicy:
+        allOf:
+        - $ref: '#/definitions/v1.PersistentVolumeReclaimPolicy'
+        description: Delete | Retain
+      volumeBindingMode:
+        $ref: '#/definitions/v1.VolumeBindingMode'
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq:
     properties:
       labels:
@@ -332,6 +413,13 @@ definitions:
       readOnly:
         description: Read-only or not
         type: boolean
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.VolumeSource:
+    properties:
+      nfs:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.NFSVolumeSource'
+      type:
+        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.ConfigMap:
     properties:
@@ -540,6 +628,33 @@ definitions:
       type:
         $ref: '#/definitions/v1.SecretType'
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass:
+    properties:
+      age:
+        type: integer
+      allowVolumeExpansion:
+        type: boolean
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item'
+        type: array
+      mountOptions:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      parameters:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Item'
+        type: array
+      provisioner:
+        type: string
+      reclaimPolicy:
+        $ref: '#/definitions/v1.PersistentVolumeReclaimPolicy'
+      volumeBindingMode:
+        $ref: '#/definitions/v1.VolumeBindingMode'
+    type: object
   github_com_crazyfrankie_kube-ctl_pkg_response.Response:
     properties:
       code:
@@ -711,6 +826,14 @@ definitions:
     x-enum-varnames:
     - TolerationOpExists
     - TolerationOpEqual
+  v1.VolumeBindingMode:
+    enum:
+    - Immediate
+    - WaitForFirstConsumer
+    type: string
+    x-enum-varnames:
+    - VolumeBindingImmediate
+    - VolumeBindingWaitForFirstConsumer
 info:
   contact: {}
 paths:
@@ -1182,6 +1305,12 @@ paths:
       consumes:
       - application/json
       description: 删除一个 PersistentVolume 存储空间
+      parameters:
+      - description: PV 名称
+        in: query
+        name: name
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -1225,11 +1354,22 @@ paths:
       consumes:
       - application/json
       description: 创建一个 PersistentVolume 存储空间
+      parameters:
+      - description: PV 信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolume'
       produces:
       - application/json
       responses:
         "200":
           description: 创建 PV 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20000)
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "500":
@@ -1244,6 +1384,12 @@ paths:
       consumes:
       - application/json
       description: 删除一个 PersistentVolumeClaim 存储声明
+      parameters:
+      - description: PVC 名称
+        in: query
+        name: name
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -1287,11 +1433,22 @@ paths:
       consumes:
       - application/json
       description: 创建一个 PersistentVolumeClaim 声明用户的存储需求
+      parameters:
+      - description: PVC 信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolumeClaim'
       produces:
       - application/json
       responses:
         "200":
           description: 创建 PVC 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20000)
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "500":
@@ -1426,4 +1583,83 @@ paths:
       summary: 获取Secret列表
       tags:
       - Secret管理
+  /api/storage:
+    delete:
+      consumes:
+      - application/json
+      description: 删除一个 StorageClass 存储类
+      parameters:
+      - description: StorageClass 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 StorageClass 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 StorageClass
+      tags:
+      - StorageClass 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取所有 StorageClass 存储类信息
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 获取成功
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 StorageClass 列表
+      tags:
+      - PVC 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建一个 StorageClas 存储类
+      parameters:
+      - description: StorageClass 信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 StorageClass 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20000或20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建 StorageClass
+      tags:
+      - StorageClass 管理
 swagger: "2.0"
