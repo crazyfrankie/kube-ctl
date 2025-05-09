@@ -3,8 +3,8 @@ package validate
 import (
 	"errors"
 	"fmt"
-	"github.com/crazyfrankie/kube-ctl/conf"
 
+	"github.com/crazyfrankie/kube-ctl/conf"
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/pkg/consts"
 )
@@ -56,10 +56,15 @@ func PodValidate(pod *req.Pod) error {
 
 func StorageClassValidate(sc *req.StorageClass) error {
 	expectedProv := conf.GetConf().StorageClass.Provisioner
+	flag := false
 	for _, i := range expectedProv {
-		if i == sc.Provisioner {
-			return nil
+		if i != sc.Provisioner {
+			flag = true
+			break
 		}
+	}
+	if flag {
+		return nil
 	}
 
 	return errors.New("unsupported provisioner type")

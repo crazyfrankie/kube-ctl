@@ -1,0 +1,6 @@
+server:
+  addr: "your-port"
+
+storageClass:
+  provisioner:
+    - "your-provisioner"
