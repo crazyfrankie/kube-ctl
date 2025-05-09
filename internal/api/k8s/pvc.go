@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
@@ -39,14 +40,14 @@ func (h *PVCHandler) RegisterRoute(r *gin.Engine) {
 // @Produce json
 // @Param pod body req.PersistentVolumeClaim true "PVC 信息"
 // @Success 200 {object} response.Response "创建 PVC 成功"
-// @Failure 400 {object} response.Response "参数错误(code=20000)"
+// @Failure 400 {object} response.Response "参数错误(code=20001)"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pvc [post]
 func (h *PVCHandler) CreatePVC() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var createReq req.PersistentVolumeClaim
 		if err := c.ShouldBind(&createReq); err != nil {
-			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20000, "bind error "+err.Error()))
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20001, "bind error "+err.Error()))
 			return
 		}
 
@@ -91,12 +92,15 @@ func (h *PVCHandler) DeletePVC() gin.HandlerFunc {
 // @Tags PVC 管理
 // @Accept json
 // @Produce json
+// @Param namespace query string true "命名空间"
+// @Param keyword query string true "关键词"
 // @Success 200 {object} response.Response{data=[]resp.PersistentVolumeClaim} "获取成功"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pvc [get]
 func (h *PVCHandler) GetPVCList() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ns := c.Query("namespace")
+		keyword := c.Query("keyword")
 
 		res, err := h.svc.GetPVCList(context.Background(), ns)
 		if err != nil {
@@ -106,7 +110,9 @@ func (h *PVCHandler) GetPVCList() gin.HandlerFunc {
 
 		pvcs := make([]resp.PersistentVolumeClaim, 0, len(res))
 		for _, i := range res {
-			pvcs = append(pvcs, convert.PVCRespConvert(&i))
+			if strings.Contains(i.Name, keyword) {
+				pvcs = append(pvcs, convert.PVCRespConvert(&i))
+			}
 		}
 
 		response.SuccessWithData(c, pvcs)

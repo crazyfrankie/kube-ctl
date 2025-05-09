@@ -4,9 +4,9 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
 
-	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/crazyfrankie/kube-ctl/internal/model/convert"
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
@@ -40,20 +40,20 @@ func (h *StorageClassHandler) RegisterRoute(r *gin.Engine) {
 // @Produce json
 // @Param pod body req.StorageClass true "StorageClass 信息"
 // @Success 200 {object} response.Response "创建 StorageClass 成功"
-// @Failure 400 {object} response.Response "参数错误(code=20000或20001)"
+// @Failure 400 {object} response.Response "参数错误(code=20001或20002)"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/storage [post]
 func (h *StorageClassHandler) CreateStorageClass() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var createReq req.StorageClass
 		if err := c.ShouldBind(&createReq); err != nil {
-			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20000, "bind error "+err.Error()))
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20001, "bind error "+err.Error()))
 			return
 		}
 
 		err := validate.StorageClassValidate(&createReq)
 		if err != nil {
-			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20001, err.Error()))
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20002, err.Error()))
 			return
 		}
 

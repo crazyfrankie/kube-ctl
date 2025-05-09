@@ -39,14 +39,14 @@ func (h *PVHandler) RegisterRoute(r *gin.Engine) {
 // @Produce json
 // @Param pod body req.PersistentVolume true "PV 信息"
 // @Success 200 {object} response.Response "创建 PV 成功"
-// @Failure 400 {object} response.Response "参数错误(code=20000)"
+// @Failure 400 {object} response.Response "参数错误(code=20001)"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/pv [post]
 func (h *PVHandler) CreatePV() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var createReq req.PersistentVolume
 		if err := c.Bind(&createReq); err != nil {
-			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20000, "bind error "+err.Error()))
+			response.Error(c, http.StatusBadRequest, gerrors.NewBizError(20001, "bind error "+err.Error()))
 			return
 		}
 

@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -27,6 +28,7 @@ func main() {
 			log.Printf("Server Listen: %s\n", err)
 		}
 	}()
+	log.Println(fmt.Sprintf("Server is running at http://localhost%s", srv.Addr))
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)

@@ -390,6 +390,38 @@ definitions:
       optional:
         type: boolean
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Service:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      ports:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServicePort'
+        type: array
+      selector:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      type:
+        $ref: '#/definitions/v1.ServiceType'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.ServicePort:
+    properties:
+      name:
+        type: string
+      nodePort:
+        type: integer
+      port:
+        type: integer
+      targetPort:
+        type: integer
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass:
     properties:
       allowVolumeExpansion:
@@ -681,6 +713,23 @@ definitions:
       type:
         $ref: '#/definitions/v1.SecretType'
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.Service:
+    properties:
+      age:
+        type: integer
+      clusterIP:
+        type: string
+      externalIP:
+        items:
+          type: string
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      type:
+        $ref: '#/definitions/v1.ServiceType'
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass:
     properties:
       age:
@@ -818,6 +867,18 @@ definitions:
     - SecretTypeSSHAuth
     - SecretTypeTLS
     - SecretTypeBootstrapToken
+  v1.ServiceType:
+    enum:
+    - ClusterIP
+    - NodePort
+    - LoadBalancer
+    - ExternalName
+    type: string
+    x-enum-varnames:
+    - ServiceTypeClusterIP
+    - ServiceTypeNodePort
+    - ServiceTypeLoadBalancer
+    - ServiceTypeExternalName
   v1.Taint:
     properties:
       effect:
@@ -1012,6 +1073,11 @@ paths:
       - description: 命名空间
         in: query
         name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
         required: true
         type: string
       produces:
@@ -1442,7 +1508,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "400":
-          description: 参数错误(code=20000)
+          description: 参数错误(code=20001)
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "500":
@@ -1481,6 +1547,17 @@ paths:
       consumes:
       - application/json
       description: 获取所有 PersistentVolumeClaim 存储声明信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -1521,7 +1598,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "400":
-          description: 参数错误(code=20000)
+          description: 参数错误(code=20001)
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "500":
@@ -1656,6 +1733,137 @@ paths:
       summary: 获取Secret列表
       tags:
       - Secret管理
+  /api/service:
+    delete:
+      consumes:
+      - application/json
+      description: 删除一个 Service
+      parameters:
+      - description: Service 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 Service 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 Service
+      tags:
+      - Service 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 Service 或更新已存在的 Service
+      parameters:
+      - description: Service 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 Service
+      tags:
+      - Service 管理
+  /api/service/detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Service的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Service 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Service的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Service详情
+      tags:
+      - Service 管理
+  /api/service/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Service的列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Service的列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Service'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Service列表
+      tags:
+      - Service 管理
   /api/storage:
     delete:
       consumes:
@@ -1725,7 +1933,7 @@ paths:
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "400":
-          description: 参数错误(code=20000或20001)
+          description: 参数错误(code=20001或20002)
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
         "500":

@@ -179,6 +179,13 @@ const docTemplate = `{
                         "name": "namespace",
                         "in": "query",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -829,7 +836,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "参数错误(code=20000)",
+                        "description": "参数错误(code=20001)",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
@@ -892,6 +899,22 @@ const docTemplate = `{
                     "PVC 管理"
                 ],
                 "summary": "获取 PVC 列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "获取成功",
@@ -953,7 +976,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "参数错误(code=20000)",
+                        "description": "参数错误(code=20001)",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
@@ -1200,6 +1223,212 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/service": {
+            "post": {
+                "description": "创建新的 Service 或更新已存在的 Service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service 管理"
+                ],
+                "summary": "创建或更新 Service",
+                "parameters": [
+                    {
+                        "description": "Service 配置信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "操作成功，返回成功消息",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20001)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 Service",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service 管理"
+                ],
+                "summary": "删除 Service",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Service 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除 Service 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/service/detail": {
+            "get": {
+                "description": "获取指定命名空间下指定Service的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service 管理"
+                ],
+                "summary": "获取Service详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Service的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/service/list": {
+            "get": {
+                "description": "获取指定命名空间下指定Service的列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service 管理"
+                ],
+                "summary": "获取Service列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Service的列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Service"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/storage": {
             "get": {
                 "description": "获取所有 StorageClass 存储类信息",
@@ -1274,7 +1503,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "参数错误(code=20000或20001)",
+                        "description": "参数错误(code=20001或20002)",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
@@ -1926,6 +2155,55 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Service": {
+            "type": "object",
+            "properties": {
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "ports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServicePort"
+                    }
+                },
+                "selector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "type": {
+                    "$ref": "#/definitions/v1.ServiceType"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.ServicePort": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "nodePort": {
+                    "type": "integer"
+                },
+                "port": {
+                    "type": "integer"
+                },
+                "targetPort": {
+                    "type": "integer"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass": {
             "type": "object",
             "properties": {
@@ -2366,6 +2644,32 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.Service": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "clusterIP": {
+                    "type": "string"
+                },
+                "externalIP": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/v1.ServiceType"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass": {
             "type": "object",
             "properties": {
@@ -2540,6 +2844,21 @@ const docTemplate = `{
                 "SecretTypeSSHAuth",
                 "SecretTypeTLS",
                 "SecretTypeBootstrapToken"
+            ]
+        },
+        "v1.ServiceType": {
+            "type": "string",
+            "enum": [
+                "ClusterIP",
+                "NodePort",
+                "LoadBalancer",
+                "ExternalName"
+            ],
+            "x-enum-varnames": [
+                "ServiceTypeClusterIP",
+                "ServiceTypeNodePort",
+                "ServiceTypeLoadBalancer",
+                "ServiceTypeExternalName"
             ]
         },
         "v1.Taint": {

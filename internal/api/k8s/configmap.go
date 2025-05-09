@@ -3,6 +3,7 @@ package k8s
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/crazyfrankie/gem/gerrors"
 	"github.com/gin-gonic/gin"
@@ -96,12 +97,14 @@ func (h *ConfigMapHandler) GetConfigMap() gin.HandlerFunc {
 // @Accept json
 // @Produce json
 // @Param namespace query string true "命名空间"
+// @Param keyword query string true "关键词"
 // @Success 200 {object} response.Response{data=[]resp.ConfigMap} "返回ConfigMap列表"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/configmap/list [get]
 func (h *ConfigMapHandler) GetConfigMapList() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		ns := c.Query("namespace")
+		keyword := c.Query("keyword")
 
 		res, err := h.svc.GetConfigMapList(context.Background(), ns)
 		if err != nil {
@@ -111,7 +114,9 @@ func (h *ConfigMapHandler) GetConfigMapList() gin.HandlerFunc {
 
 		cms := make([]resp.ConfigMap, 0, len(res))
 		for _, i := range res {
-			cms = append(cms, convert.CMConvertListResp(&i))
+			if strings.Contains(i.Name, keyword) {
+				cms = append(cms, convert.CMConvertListResp(&i))
+			}
 		}
 
 		response.SuccessWithData(c, cms)
