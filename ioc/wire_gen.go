@@ -39,7 +39,9 @@ func InitServer() *gin.Engine {
 	storageClassHandler := k8s.NewStorageClassHandler(storageClassService)
 	svcService := service.NewServiceService(clientset)
 	serviceHandler := k8s.NewServiceHandler(svcService)
-	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler)
+	ingressService := service.NewIngressService(clientset)
+	ingressHandler := k8s.NewIngressHandler(ingressService)
+	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler, ingressHandler)
 	return engine
 }
 
@@ -68,7 +70,7 @@ func InitMws() []gin.HandlerFunc {
 func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	configmap *k8s.ConfigMapHandler, secret *k8s.SecretHandler, pv *k8s.PVHandler,
 	pvc *k8s.PVCHandler, storage *k8s.StorageClassHandler,
-	svc *k8s.ServiceHandler) *gin.Engine {
+	svc *k8s.ServiceHandler, ingress *k8s.IngressHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 
@@ -80,6 +82,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	pvc.RegisterRoute(srv)
 	storage.RegisterRoute(srv)
 	svc.RegisterRoute(srv)
+	ingress.RegisterRoute(srv)
 
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	docs.SwaggerInfo.

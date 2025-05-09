@@ -219,6 +219,212 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/ingress": {
+            "post": {
+                "description": "创建新的 Ingress 或更新已存在的 Ingress",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ingress 管理"
+                ],
+                "summary": "创建或更新 Ingress",
+                "parameters": [
+                    {
+                        "description": "Ingress 配置信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "操作成功，返回成功消息",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20001)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 Ingress",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ingress 管理"
+                ],
+                "summary": "删除 Ingress",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Ingress 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除 Ingress 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ingress/detail": {
+            "get": {
+                "description": "获取指定命名空间下指定Ingress的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ingress 管理"
+                ],
+                "summary": "获取Ingress详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Ingress 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Ingress的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ingress/list": {
+            "get": {
+                "description": "获取指定命名空间下指定Ingress的列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ingress 管理"
+                ],
+                "summary": "获取Ingress列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Ingress的列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Ingress"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/node/detail": {
             "get": {
                 "description": "获取集群中单个 Node 信息",
@@ -1839,6 +2045,40 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress": {
+            "type": "object",
+            "properties": {
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "rules": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule"
+                    }
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule": {
+            "type": "object",
+            "properties": {
+                "host": {
+                    "type": "string"
+                },
+                "value": {
+                    "$ref": "#/definitions/v1.IngressRuleValue"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Item": {
             "type": "object",
             "properties": {
@@ -2379,6 +2619,26 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.Ingress": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "class": {
+                    "type": "string"
+                },
+                "hosts": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_resp.Item": {
             "type": "object",
             "properties": {
@@ -2723,6 +2983,43 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.HTTPIngressPath": {
+            "type": "object",
+            "properties": {
+                "backend": {
+                    "description": "backend defines the referenced service endpoint to which the traffic\nwill be forwarded to.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.IngressBackend"
+                        }
+                    ]
+                },
+                "path": {
+                    "description": "path is matched against the path of an incoming request. Currently it can\ncontain characters disallowed from the conventional \"path\" part of a URL\nas defined by RFC 3986. Paths must begin with a '/' and must be present\nwhen using PathType with value \"Exact\" or \"Prefix\".\n+optional",
+                    "type": "string"
+                },
+                "pathType": {
+                    "description": "pathType determines the interpretation of the path matching. PathType can\nbe one of the following values:\n* Exact: Matches the URL path exactly.\n* Prefix: Matches based on a URL path prefix split by '/'. Matching is\n  done on a path element by element basis. A path element refers is the\n  list of labels in the path split by the '/' separator. A request is a\n  match for path p if every p is an element-wise prefix of p of the\n  request path. Note that if the last element of the path is a substring\n  of the last element in request path, it is not a match (e.g. /foo/bar\n  matches /foo/bar/baz, but does not match /foo/barbaz).\n* ImplementationSpecific: Interpretation of the Path matching is up to\n  the IngressClass. Implementations can treat this as a separate PathType\n  or treat it identically to Prefix or Exact path types.\nImplementations are required to support all path types.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.PathType"
+                        }
+                    ]
+                }
+            }
+        },
+        "v1.HTTPIngressRuleValue": {
+            "type": "object",
+            "properties": {
+                "paths": {
+                    "description": "paths is a collection of paths that map requests to backends.\n+listType=atomic",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.HTTPIngressPath"
+                    }
+                }
+            }
+        },
         "v1.HostPathType": {
             "type": "string",
             "enum": [
@@ -2746,6 +3043,57 @@ const docTemplate = `{
                 "HostPathBlockDev"
             ]
         },
+        "v1.IngressBackend": {
+            "type": "object",
+            "properties": {
+                "resource": {
+                    "description": "resource is an ObjectRef to another Kubernetes resource in the namespace\nof the Ingress object. If resource is specified, a service.Name and\nservice.Port must not be specified.\nThis is a mutually exclusive setting with \"Service\".\n+optional",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.TypedLocalObjectReference"
+                        }
+                    ]
+                },
+                "service": {
+                    "description": "service references a service as a backend.\nThis is a mutually exclusive setting with \"Resource\".\n+optional",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.IngressServiceBackend"
+                        }
+                    ]
+                }
+            }
+        },
+        "v1.IngressRuleValue": {
+            "type": "object",
+            "properties": {
+                "http": {
+                    "description": "+optional",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.HTTPIngressRuleValue"
+                        }
+                    ]
+                }
+            }
+        },
+        "v1.IngressServiceBackend": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "name is the referenced service. The service must exist in\nthe same namespace as the Ingress object.",
+                    "type": "string"
+                },
+                "port": {
+                    "description": "port of the referenced service. A port name or port number\nis required for a IngressServiceBackend.",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/v1.ServiceBackendPort"
+                        }
+                    ]
+                }
+            }
+        },
         "v1.NodeSelectorOperator": {
             "type": "string",
             "enum": [
@@ -2763,6 +3111,19 @@ const docTemplate = `{
                 "NodeSelectorOpDoesNotExist",
                 "NodeSelectorOpGt",
                 "NodeSelectorOpLt"
+            ]
+        },
+        "v1.PathType": {
+            "type": "string",
+            "enum": [
+                "Exact",
+                "Prefix",
+                "ImplementationSpecific"
+            ],
+            "x-enum-varnames": [
+                "PathTypeExact",
+                "PathTypePrefix",
+                "PathTypeImplementationSpecific"
             ]
         },
         "v1.PersistentVolumeAccessMode": {
@@ -2845,6 +3206,19 @@ const docTemplate = `{
                 "SecretTypeTLS",
                 "SecretTypeBootstrapToken"
             ]
+        },
+        "v1.ServiceBackendPort": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "description": "name is the name of the port on the Service.\nThis is a mutually exclusive setting with \"Number\".\n+optional",
+                    "type": "string"
+                },
+                "number": {
+                    "description": "number is the numerical port number (e.g. 80) on the Service.\nThis is a mutually exclusive setting with \"Name\".\n+optional",
+                    "type": "integer"
+                }
+            }
         },
         "v1.ServiceType": {
             "type": "string",
@@ -2942,6 +3316,23 @@ const docTemplate = `{
                 "TolerationOpExists",
                 "TolerationOpEqual"
             ]
+        },
+        "v1.TypedLocalObjectReference": {
+            "type": "object",
+            "properties": {
+                "apiGroup": {
+                    "description": "APIGroup is the group for the resource being referenced.\nIf APIGroup is not specified, the specified Kind must be in the core API group.\nFor any other third-party types, APIGroup is required.\n+optional",
+                    "type": "string"
+                },
+                "kind": {
+                    "description": "Kind is the type of resource being referenced",
+                    "type": "string"
+                },
+                "name": {
+                    "description": "Name is the name of resource being referenced",
+                    "type": "string"
+                }
+            }
         },
         "v1.VolumeBindingMode": {
             "type": "string",

@@ -184,6 +184,28 @@ definitions:
       type:
         $ref: '#/definitions/v1.HostPathType'
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      rules:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule'
+        type: array
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule:
+    properties:
+      host:
+        type: string
+      value:
+        $ref: '#/definitions/v1.IngressRuleValue'
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Item:
     properties:
       key:
@@ -536,6 +558,19 @@ definitions:
       namespace:
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.Ingress:
+    properties:
+      age:
+        type: integer
+      class:
+        type: string
+      hosts:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.Item:
     properties:
       key:
@@ -765,6 +800,51 @@ definitions:
       msg:
         type: string
     type: object
+  v1.HTTPIngressPath:
+    properties:
+      backend:
+        allOf:
+        - $ref: '#/definitions/v1.IngressBackend'
+        description: |-
+          backend defines the referenced service endpoint to which the traffic
+          will be forwarded to.
+      path:
+        description: |-
+          path is matched against the path of an incoming request. Currently it can
+          contain characters disallowed from the conventional "path" part of a URL
+          as defined by RFC 3986. Paths must begin with a '/' and must be present
+          when using PathType with value "Exact" or "Prefix".
+          +optional
+        type: string
+      pathType:
+        allOf:
+        - $ref: '#/definitions/v1.PathType'
+        description: |-
+          pathType determines the interpretation of the path matching. PathType can
+          be one of the following values:
+          * Exact: Matches the URL path exactly.
+          * Prefix: Matches based on a URL path prefix split by '/'. Matching is
+            done on a path element by element basis. A path element refers is the
+            list of labels in the path split by the '/' separator. A request is a
+            match for path p if every p is an element-wise prefix of p of the
+            request path. Note that if the last element of the path is a substring
+            of the last element in request path, it is not a match (e.g. /foo/bar
+            matches /foo/bar/baz, but does not match /foo/barbaz).
+          * ImplementationSpecific: Interpretation of the Path matching is up to
+            the IngressClass. Implementations can treat this as a separate PathType
+            or treat it identically to Prefix or Exact path types.
+          Implementations are required to support all path types.
+    type: object
+  v1.HTTPIngressRuleValue:
+    properties:
+      paths:
+        description: |-
+          paths is a collection of paths that map requests to backends.
+          +listType=atomic
+        items:
+          $ref: '#/definitions/v1.HTTPIngressPath'
+        type: array
+    type: object
   v1.HostPathType:
     enum:
     - ""
@@ -785,6 +865,46 @@ definitions:
     - HostPathSocket
     - HostPathCharDev
     - HostPathBlockDev
+  v1.IngressBackend:
+    properties:
+      resource:
+        allOf:
+        - $ref: '#/definitions/v1.TypedLocalObjectReference'
+        description: |-
+          resource is an ObjectRef to another Kubernetes resource in the namespace
+          of the Ingress object. If resource is specified, a service.Name and
+          service.Port must not be specified.
+          This is a mutually exclusive setting with "Service".
+          +optional
+      service:
+        allOf:
+        - $ref: '#/definitions/v1.IngressServiceBackend'
+        description: |-
+          service references a service as a backend.
+          This is a mutually exclusive setting with "Resource".
+          +optional
+    type: object
+  v1.IngressRuleValue:
+    properties:
+      http:
+        allOf:
+        - $ref: '#/definitions/v1.HTTPIngressRuleValue'
+        description: +optional
+    type: object
+  v1.IngressServiceBackend:
+    properties:
+      name:
+        description: |-
+          name is the referenced service. The service must exist in
+          the same namespace as the Ingress object.
+        type: string
+      port:
+        allOf:
+        - $ref: '#/definitions/v1.ServiceBackendPort'
+        description: |-
+          port of the referenced service. A port name or port number
+          is required for a IngressServiceBackend.
+    type: object
   v1.NodeSelectorOperator:
     enum:
     - In
@@ -801,6 +921,16 @@ definitions:
     - NodeSelectorOpDoesNotExist
     - NodeSelectorOpGt
     - NodeSelectorOpLt
+  v1.PathType:
+    enum:
+    - Exact
+    - Prefix
+    - ImplementationSpecific
+    type: string
+    x-enum-varnames:
+    - PathTypeExact
+    - PathTypePrefix
+    - PathTypeImplementationSpecific
   v1.PersistentVolumeAccessMode:
     enum:
     - ReadWriteOnce
@@ -867,6 +997,21 @@ definitions:
     - SecretTypeSSHAuth
     - SecretTypeTLS
     - SecretTypeBootstrapToken
+  v1.ServiceBackendPort:
+    properties:
+      name:
+        description: |-
+          name is the name of the port on the Service.
+          This is a mutually exclusive setting with "Number".
+          +optional
+        type: string
+      number:
+        description: |-
+          number is the numerical port number (e.g. 80) on the Service.
+          This is a mutually exclusive setting with "Name".
+          +optional
+        type: integer
+    type: object
   v1.ServiceType:
     enum:
     - ClusterIP
@@ -960,6 +1105,22 @@ definitions:
     x-enum-varnames:
     - TolerationOpExists
     - TolerationOpEqual
+  v1.TypedLocalObjectReference:
+    properties:
+      apiGroup:
+        description: |-
+          APIGroup is the group for the resource being referenced.
+          If APIGroup is not specified, the specified Kind must be in the core API group.
+          For any other third-party types, APIGroup is required.
+          +optional
+        type: string
+      kind:
+        description: Kind is the type of resource being referenced
+        type: string
+      name:
+        description: Name is the name of resource being referenced
+        type: string
+    type: object
   v1.VolumeBindingMode:
     enum:
     - Immediate
@@ -1101,6 +1262,137 @@ paths:
       summary: 获取ConfigMap列表
       tags:
       - ConfigMap管理
+  /api/ingress:
+    delete:
+      consumes:
+      - application/json
+      description: 删除一个 Ingress
+      parameters:
+      - description: Ingress 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 Ingress 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 Ingress
+      tags:
+      - Ingress 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 Ingress 或更新已存在的 Ingress
+      parameters:
+      - description: Ingress 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 Ingress
+      tags:
+      - Ingress 管理
+  /api/ingress/detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Ingress的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Ingress 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Ingress的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Ingress详情
+      tags:
+      - Ingress 管理
+  /api/ingress/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Ingress的列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Ingress的列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Ingress'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Ingress列表
+      tags:
+      - Ingress 管理
   /api/node/detail:
     get:
       consumes:
