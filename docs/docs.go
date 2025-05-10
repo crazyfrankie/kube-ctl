@@ -471,7 +471,7 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "删除一个 IngresRoute",
+                "description": "删除一个 IngressRoute",
                 "consumes": [
                     "application/json"
                 ],
@@ -479,13 +479,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "IngresRoute 管理"
+                    "IngressRoute 管理"
                 ],
-                "summary": "删除 IngresRoute",
+                "summary": "删除 IngressRoute",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "IngresRoute 名称",
+                        "description": "IngressRoute 名称",
                         "name": "name",
                         "in": "query",
                         "required": true
@@ -500,7 +500,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "删除 IngresRoute 成功",
+                        "description": "删除 IngressRoute 成功",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
                         }
