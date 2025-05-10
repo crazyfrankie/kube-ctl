@@ -27,7 +27,7 @@ func (h *IngressRouteHandler) RegisterRoute(r *gin.Engine) {
 	irGroup := r.Group("api/ingroute")
 	{
 		irGroup.POST("", h.CreateOrUpdateIngresRoute())
-		irGroup.DELETE("", h.DeleteIngresRoute())
+		irGroup.DELETE("", h.DeleteIngressRoute())
 		irGroup.GET("detail", h.GetIngressRouteDetail())
 		irGroup.GET("list", h.GetIngressRouteList())
 		irGroup.GET("mws", h.GetIngressRouteMws())
@@ -63,18 +63,18 @@ func (h *IngressRouteHandler) CreateOrUpdateIngresRoute() gin.HandlerFunc {
 	}
 }
 
-// DeleteIngresRoute
-// @Summary 删除 IngresRoute
-// @Description 删除一个 IngresRoute
-// @Tags IngresRoute 管理
+// DeleteIngressRoute
+// @Summary 删除 IngressRoute
+// @Description 删除一个 IngressRoute
+// @Tags IngressRoute 管理
 // @Accept json
 // @Produce json
-// @Param name query string true "IngresRoute 名称"
+// @Param name query string true "IngressRoute 名称"
 // @Param namespace query string true "命名空间"
-// @Success 200 {object} response.Response "删除 IngresRoute 成功"
+// @Success 200 {object} response.Response "删除 IngressRoute 成功"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
 // @Router /api/ingroute [delete]
-func (h *IngressRouteHandler) DeleteIngresRoute() gin.HandlerFunc {
+func (h *IngressRouteHandler) DeleteIngressRoute() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Query("name")
 		ns := c.Query("namespace")
