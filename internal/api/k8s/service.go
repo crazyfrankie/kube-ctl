@@ -29,7 +29,7 @@ func (h *ServiceHandler) RegisterRoute(r *gin.Engine) {
 		serviceGroup.POST("", h.CreateOrUpdateService())
 		serviceGroup.DELETE("", h.DeleteService())
 		serviceGroup.GET("detail", h.GetServiceDetail())
-		serviceGroup.GET("list")
+		serviceGroup.GET("list", h.GetServiceList())
 	}
 }
 
