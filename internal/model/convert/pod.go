@@ -406,7 +406,7 @@ func getReqVolume(volumes []corev1.Volume) ([]req.Volume, map[string]string) {
 		if v.ConfigMap != nil {
 			volume.Type = ConfigMapVolume
 			var optional bool
-			if v.Secret.Optional != nil {
+			if v.ConfigMap.Optional != nil {
 				optional = *v.Secret.Optional
 			}
 			volume.ConfigMapRefVolume = req.ConfigMapRefVolume{
