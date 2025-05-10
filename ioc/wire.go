@@ -41,7 +41,8 @@ func InitMws() []gin.HandlerFunc {
 func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	configmap *k8s.ConfigMapHandler, secret *k8s.SecretHandler, pv *k8s.PVHandler,
 	pvc *k8s.PVCHandler, storage *k8s.StorageClassHandler,
-	svc *k8s.ServiceHandler, ingress *k8s.IngressHandler) *gin.Engine {
+	svc *k8s.ServiceHandler, ingress *k8s.IngressHandler,
+	igRoute *k8s.IngressRouteHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 
@@ -54,6 +55,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	storage.RegisterRoute(srv)
 	svc.RegisterRoute(srv)
 	ingress.RegisterRoute(srv)
+	igRoute.RegisterRoute(srv)
 
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
@@ -76,6 +78,7 @@ func InitServer() *gin.Engine {
 		service.NewStorageClassService,
 		service.NewServiceService,
 		service.NewIngressService,
+		service.NewIngressRouteService,
 		k8s.NewPodHandler,
 		k8s.NewNodeHandler,
 		k8s.NewConfigMapHandler,
@@ -85,6 +88,7 @@ func InitServer() *gin.Engine {
 		k8s.NewStorageClassHandler,
 		k8s.NewServiceHandler,
 		k8s.NewIngressHandler,
+		k8s.NewIngressRouteHandler,
 
 		InitGin,
 	)

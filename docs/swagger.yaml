@@ -199,6 +199,39 @@ definitions:
           $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule'
         type: array
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute:
+    properties:
+      ingressRouteSpec:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteSpec'
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService:
+    properties:
+      name:
+        type: string
+      port:
+        type: integer
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteSpec:
+    properties:
+      entryPoints:
+        items:
+          type: string
+        type: array
+      routes:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Route'
+        type: array
+      tls:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.TLS'
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule:
     properties:
       host:
@@ -386,6 +419,17 @@ definitions:
       memoryLimit:
         type: integer
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Route:
+    properties:
+      kind:
+        type: string
+      match:
+        type: string
+      services:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService'
+        type: array
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Secret:
     properties:
       data:
@@ -473,6 +517,11 @@ definitions:
         description: Delete | Retain
       volumeBindingMode:
         $ref: '#/definitions/v1.VolumeBindingMode'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.TLS:
+    properties:
+      secretName:
+        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq:
     properties:
@@ -566,6 +615,15 @@ definitions:
         type: string
       hosts:
         type: string
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.IngressRoute:
+    properties:
+      age:
+        type: integer
       name:
         type: string
       namespace:
@@ -1393,6 +1451,137 @@ paths:
       summary: 获取Ingress列表
       tags:
       - Ingress 管理
+  /api/ingroute:
+    delete:
+      consumes:
+      - application/json
+      description: 删除一个 IngresRoute
+      parameters:
+      - description: IngresRoute 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 IngresRoute 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 IngresRoute
+      tags:
+      - IngresRoute 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 IngressRoute 或更新已存在的 IngressRoute
+      parameters:
+      - description: IngressRoute 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 IngressRoute
+      tags:
+      - IngressRoute 管理
+  /api/ingroute/detail:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定IngressRoute的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: IngressRoute 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回IngressRoute的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取IngresRoute详情
+      tags:
+      - IngressRoute 管理
+  /api/ingroute/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定IngressRoute的列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回IngressRoute的列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.IngressRoute'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取IngressRoute列表
+      tags:
+      - IngressRoute 管理
   /api/node/detail:
     get:
       consumes:

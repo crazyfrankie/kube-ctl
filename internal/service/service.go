@@ -29,12 +29,10 @@ func NewServiceService(cs *kubernetes.Clientset) SvcService {
 func (s *svcService) CreateOrUpdateService(ctx context.Context, req *req.Service) error {
 	svc := convert.ServiceReqConvert(req)
 
-	if exists, err := s.clientSet.CoreV1().Services(svc.Namespace).Get(ctx, svc.Name, metav1.GetOptions{}); err == nil {
-		exists.Spec = svc.Spec
-		_, err := s.clientSet.CoreV1().Services(svc.Namespace).Update(ctx, exists, metav1.UpdateOptions{})
-		if err != nil {
-			return err
-		}
+	if _, err := s.clientSet.CoreV1().Services(svc.Namespace).Get(ctx, svc.Name, metav1.GetOptions{}); err == nil {
+		_, err := s.clientSet.CoreV1().Services(svc.Namespace).Update(ctx, svc, metav1.UpdateOptions{})
+
+		return err
 	}
 
 	_, err := s.clientSet.CoreV1().Services(svc.Namespace).Create(ctx, svc, metav1.CreateOptions{})

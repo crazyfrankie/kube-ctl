@@ -29,12 +29,10 @@ func NewIngressService(cs *kubernetes.Clientset) IngressService {
 func (s *ingressService) CreateOrUpdateIngress(ctx context.Context, req *req.Ingress) error {
 	ingress := convert.IngressReqConvert(req)
 
-	if exists, err := s.clientSet.NetworkingV1().Ingresses(ingress.Namespace).Get(ctx, ingress.Name, metav1.GetOptions{}); err == nil {
-		exists.Spec = ingress.Spec
-		_, err := s.clientSet.NetworkingV1().Ingresses(ingress.Namespace).Update(ctx, exists, metav1.UpdateOptions{})
-		if err != nil {
-			return err
-		}
+	if _, err := s.clientSet.NetworkingV1().Ingresses(ingress.Namespace).Get(ctx, ingress.Name, metav1.GetOptions{}); err == nil {
+		_, err := s.clientSet.NetworkingV1().Ingresses(ingress.Namespace).Update(ctx, ingress, metav1.UpdateOptions{})
+
+		return err
 	}
 
 	_, err := s.clientSet.NetworkingV1().Ingresses(ingress.Namespace).Create(ctx, ingress, metav1.CreateOptions{})

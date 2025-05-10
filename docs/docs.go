@@ -425,6 +425,212 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/ingroute": {
+            "post": {
+                "description": "创建新的 IngressRoute 或更新已存在的 IngressRoute",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IngressRoute 管理"
+                ],
+                "summary": "创建或更新 IngressRoute",
+                "parameters": [
+                    {
+                        "description": "IngressRoute 配置信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "操作成功，返回成功消息",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20001)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除一个 IngresRoute",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IngresRoute 管理"
+                ],
+                "summary": "删除 IngresRoute",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "IngresRoute 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除 IngresRoute 成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ingroute/detail": {
+            "get": {
+                "description": "获取指定命名空间下指定IngressRoute的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IngressRoute 管理"
+                ],
+                "summary": "获取IngresRoute详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "IngressRoute 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回IngressRoute的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/ingroute/list": {
+            "get": {
+                "description": "获取指定命名空间下指定IngressRoute的列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IngressRoute 管理"
+                ],
+                "summary": "获取IngressRoute列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回IngressRoute的列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.IngressRoute"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/node/detail": {
             "get": {
                 "description": "获取集群中单个 Node 信息",
@@ -2068,6 +2274,57 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute": {
+            "type": "object",
+            "properties": {
+                "ingressRouteSpec": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteSpec"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteSpec": {
+            "type": "object",
+            "properties": {
+                "entryPoints": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "routes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Route"
+                    }
+                },
+                "tls": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.TLS"
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule": {
             "type": "object",
             "properties": {
@@ -2353,6 +2610,23 @@ const docTemplate = `{
                 }
             }
         },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Route": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string"
+                },
+                "match": {
+                    "type": "string"
+                },
+                "services": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService"
+                    }
+                }
+            }
+        },
         "github_com_crazyfrankie_kube-ctl_internal_model_req.Secret": {
             "type": "object",
             "properties": {
@@ -2488,6 +2762,14 @@ const docTemplate = `{
                 },
                 "volumeBindingMode": {
                     "$ref": "#/definitions/v1.VolumeBindingMode"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.TLS": {
+            "type": "object",
+            "properties": {
+                "secretName": {
+                    "type": "string"
                 }
             }
         },
@@ -2630,6 +2912,20 @@ const docTemplate = `{
                 },
                 "hosts": {
                     "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.IngressRoute": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
                 },
                 "name": {
                     "type": "string"
