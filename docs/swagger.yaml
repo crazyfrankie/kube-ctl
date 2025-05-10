@@ -212,13 +212,6 @@ definitions:
       namespace:
         type: string
     type: object
-  github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService:
-    properties:
-      name:
-        type: string
-      port:
-        type: integer
-    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteSpec:
     properties:
       entryPoints:
@@ -227,10 +220,34 @@ definitions:
         type: array
       routes:
         items:
-          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Route'
+          properties:
+            kind:
+              type: string
+            match:
+              type: string
+            middlewares:
+              items:
+                properties:
+                  name:
+                    type: string
+                type: object
+              type: array
+            services:
+              items:
+                properties:
+                  name:
+                    type: string
+                  port:
+                    type: integer
+                type: object
+              type: array
+          type: object
         type: array
       tls:
-        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.TLS'
+        properties:
+          secretName:
+            type: string
+        type: object
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRule:
     properties:
@@ -419,17 +436,6 @@ definitions:
       memoryLimit:
         type: integer
     type: object
-  github_com_crazyfrankie_kube-ctl_internal_model_req.Route:
-    properties:
-      kind:
-        type: string
-      match:
-        type: string
-      services:
-        items:
-          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRouteService'
-        type: array
-    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Secret:
     properties:
       data:
@@ -517,11 +523,6 @@ definitions:
         description: Delete | Retain
       volumeBindingMode:
         $ref: '#/definitions/v1.VolumeBindingMode'
-    type: object
-  github_com_crazyfrankie_kube-ctl_internal_model_req.TLS:
-    properties:
-      secretName:
-        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq:
     properties:
@@ -1580,6 +1581,38 @@ paths:
           schema:
             $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
       summary: 获取IngressRoute列表
+      tags:
+      - IngressRoute 管理
+  /api/ingroute/mws:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定IngressRoute的Middlewares列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回IngressRoute的Middlewares列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    type: string
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取IngressRoute的Middlewares列表
       tags:
       - IngressRoute 管理
   /api/node/detail:
