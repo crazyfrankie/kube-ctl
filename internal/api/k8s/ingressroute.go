@@ -2,6 +2,7 @@ package k8s
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 
@@ -138,6 +139,10 @@ func (h *IngressRouteHandler) GetIngressRouteList() gin.HandlerFunc {
 
 		res, err := h.svc.GetIngressRouteList(context.Background(), ns)
 		if err != nil {
+			if errors.Is(err, service.ErrNoResource) {
+				response.Success(c)
+				return
+			}
 			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}
@@ -173,6 +178,10 @@ func (h *IngressRouteHandler) GetIngressRouteMws() gin.HandlerFunc {
 
 		res, err := h.svc.GetIngressRouteMws(context.Background(), ns)
 		if err != nil {
+			if errors.Is(err, service.ErrNoResource) {
+				response.Success(c)
+				return
+			}
 			response.Error(c, http.StatusInternalServerError, gerrors.NewBizError(30000, err.Error()))
 			return
 		}

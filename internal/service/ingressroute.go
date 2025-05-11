@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"fmt"
+	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/bytedance/sonic"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -10,6 +11,10 @@ import (
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 	"github.com/crazyfrankie/kube-ctl/pkg/utils"
+)
+
+var (
+	ErrNoResource = fmt.Errorf("there is no ingress route")
 )
 
 type IngressRoute struct {
@@ -99,6 +104,9 @@ func (s *ingressRouteService) GetIngressRouteList(ctx context.Context, namespace
 	url := fmt.Sprintf("/apis/traefik.io/v1alpha1/namespaces/%s/ingressroutes", namespace)
 	raw, err := s.clientSet.NetworkingV1().RESTClient().Get().AbsPath(url).DoRaw(ctx)
 	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, ErrNoResource
+		}
 		return nil, err
 	}
 
@@ -114,6 +122,12 @@ func (s *ingressRouteService) GetIngressRouteMws(ctx context.Context, namespace 
 	url := fmt.Sprintf("/apis/traefik.io/v1alpha1/namespaces/%s/middlewares", namespace)
 
 	raw, err := s.clientSet.RESTClient().Get().AbsPath(url).DoRaw(ctx)
+	if err != nil {
+		if errors.IsNotFound(err) {
+			return nil, ErrNoResource
+		}
+		return nil, err
+	}
 	mws := make([]string, 0)
 	var middlewareList MiddlewareList
 	err = sonic.Unmarshal(raw, &middlewareList)
