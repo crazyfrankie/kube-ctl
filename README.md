@@ -18,6 +18,8 @@ Gin + [kubernetes/client-go](https://github.com/kubernetes/client-go)
 - [x] Ingress 创建、更新、删除、查询（详情和列表）
   - 注： Ingress controller 在本系统中作为了系统内置资源，如果在使用 Ingress 之前没有编写 IngressClass 资源的配置文件去创建 Ingress Controller, 请先创建
 - [x] IngressRoute 创建、更新、删除、查询
+- [x] Deployment 创建、更新、删除、查询（详情和列表）
+- [x] DaemonSet 创建、更新、删除、查询（详情和列表）
 
 ## 启动
 ### v1:

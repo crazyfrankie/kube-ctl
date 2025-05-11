@@ -30,7 +30,7 @@ func (p *PodHandler) RegisterRoute(r *gin.Engine) {
 		podGroup.POST("", p.CreateOrUpdatePod())
 		podGroup.POST("search", p.SearchPod())
 		podGroup.GET("namespace", p.GetNameSpace())
-		podGroup.GET("detail", p.GetPod())
+		podGroup.GET("", p.GetPod())
 		podGroup.GET("list", p.GetPodList())
 		podGroup.DELETE("", p.DeletePod())
 	}
@@ -111,7 +111,7 @@ func (p *PodHandler) CreateOrUpdatePod() gin.HandlerFunc {
 // @Param name query string true "Pod名称"
 // @Success 200 {object} response.Response{data=req.Pod} "返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
-// @Router /api/pod/detail [get]
+// @Router /api/pod [get]
 func (p *PodHandler) GetPod() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		namespace := c.Query("namespace")

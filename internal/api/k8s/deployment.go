@@ -26,7 +26,7 @@ func (h *DeploymentHandler) RegisterRoute(r *gin.Engine) {
 	{
 		deploymentGroup.POST("", h.CreateOrUpdateDeployment())
 		deploymentGroup.DELETE("", h.DeleteDeployment())
-		deploymentGroup.GET("detail", h.GetDeploymentDetail())
+		deploymentGroup.GET("", h.GetDeploymentDetail())
 		deploymentGroup.GET("list", h.GetDeploymentList())
 	}
 }
@@ -139,7 +139,7 @@ func (h *DeploymentHandler) GetDeploymentList() gin.HandlerFunc {
 		deploys := make([]resp.Deployment, 0, len(res))
 		for _, d := range res {
 			if strings.Contains(d.Name, keyword) {
-				deploys = append(deploys, convert.DeploymentConvertResp(d))
+				deploys = append(deploys, convert.DeploymentConvertResp(&d))
 			}
 		}
 

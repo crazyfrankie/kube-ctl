@@ -27,7 +27,7 @@ func (n *NodeHandler) RegisterRoute(r *gin.Engine) {
 	nodeGroup := r.Group("api/node")
 	{
 		nodeGroup.GET("list", n.NodeList())
-		nodeGroup.GET("detail", n.NodeDetail())
+		nodeGroup.GET("", n.NodeDetail())
 		nodeGroup.PUT("label", n.UpdateNodeLabel())
 		nodeGroup.PUT("taint", n.UpdateNodeTaint())
 		nodeGroup.GET("pods", n.GetNodePods())
@@ -74,7 +74,7 @@ func (n *NodeHandler) NodeList() gin.HandlerFunc {
 // @Param name query string true "node name"
 // @Success 200 {object} response.Response{data=resp.NodeDetail} "获取成功"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
-// @Router /api/node/detail [get]
+// @Router /api/node [get]
 func (n *NodeHandler) NodeDetail() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Query("name")

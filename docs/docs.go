@@ -219,6 +219,210 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/daemonset": {
+            "get": {
+                "description": "获取指定命名空间下指定DaemonSet的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DaemonSet 管理"
+                ],
+                "summary": "获取DaemonSet详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "DaemonSet 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回DaemonSet的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DaemonSet"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "创建新的 DaemonSet 或更新已存在的 DaemonSet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DaemonSet 管理"
+                ],
+                "summary": "创建或更新 DaemonSet",
+                "parameters": [
+                    {
+                        "description": "DaemonSet 配置信息",
+                        "name": "pod",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.DaemonSet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "操作成功，返回成功消息",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "400": {
+                        "description": "参数错误(code=20001)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "删除指定命名空间下的指定DaemonSet",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DaemonSet 管理"
+                ],
+                "summary": "删除 DaemonSet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "DaemonSet 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "删除成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/daemonset/list": {
+            "get": {
+                "description": "获取指定命名空间下的所有DaemonSet列表",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "DaemonSet 管理"
+                ],
+                "summary": "获取DaemonSet列表",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "关键词",
+                        "name": "keyword",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回DaemonSet列表",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.DaemonSet"
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            }
+        },
         "/api/deployment": {
             "get": {
                 "description": "获取指定命名空间下指定Deployment的详细信息",
@@ -424,6 +628,61 @@ const docTemplate = `{
             }
         },
         "/api/ingress": {
+            "get": {
+                "description": "获取指定命名空间下指定Ingress的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Ingress 管理"
+                ],
+                "summary": "获取Ingress详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Ingress 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Ingress的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "创建新的 Ingress 或更新已存在的 Ingress",
                 "consumes": [
@@ -512,63 +771,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/ingress/detail": {
-            "get": {
-                "description": "获取指定命名空间下指定Ingress的详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Ingress 管理"
-                ],
-                "summary": "获取Ingress详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "命名空间",
-                        "name": "namespace",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Ingress 名称",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回Ingress的详细信息",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Ingress"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    "500": {
-                        "description": "系统错误(code=30000)",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    }
-                }
-            }
-        },
         "/api/ingress/list": {
             "get": {
                 "description": "获取指定命名空间下指定Ingress的列表",
@@ -630,6 +832,61 @@ const docTemplate = `{
             }
         },
         "/api/ingroute": {
+            "get": {
+                "description": "获取指定命名空间下指定IngressRoute的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "IngressRoute 管理"
+                ],
+                "summary": "获取IngresRoute详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "IngressRoute 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回IngressRoute的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "创建新的 IngressRoute 或更新已存在的 IngressRoute",
                 "consumes": [
@@ -707,63 +964,6 @@ const docTemplate = `{
                         "description": "删除 IngressRoute 成功",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "系统错误(code=30000)",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/ingroute/detail": {
-            "get": {
-                "description": "获取指定命名空间下指定IngressRoute的详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "IngressRoute 管理"
-                ],
-                "summary": "获取IngresRoute详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "命名空间",
-                        "name": "namespace",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "IngressRoute 名称",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回IngressRoute的详细信息",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.IngressRoute"
-                                        }
-                                    }
-                                }
-                            ]
                         }
                     },
                     "500": {
@@ -888,7 +1088,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/node/detail": {
+        "/api/node": {
             "get": {
                 "description": "获取集群中单个 Node 信息",
                 "consumes": [
@@ -1132,6 +1332,61 @@ const docTemplate = `{
             }
         },
         "/api/pod": {
+            "get": {
+                "description": "获取指定命名空间下指定Pod的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pod管理"
+                ],
+                "summary": "获取Pod详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Pod名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "创建新的Pod或更新已存在的Pod",
                 "consumes": [
@@ -1209,63 +1464,6 @@ const docTemplate = `{
                         "description": "删除成功",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "系统错误(code=30000)",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/pod/detail": {
-            "get": {
-                "description": "获取指定命名空间下指定Pod的详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Pod管理"
-                ],
-                "summary": "获取Pod详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "命名空间",
-                        "name": "namespace",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Pod名称",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回Pod的详细信息，包含基础信息、卷配置、网络配置、初始化容器和主容器配置",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod"
-                                        }
-                                    }
-                                }
-                            ]
                         }
                     },
                     "500": {
@@ -1893,6 +2091,61 @@ const docTemplate = `{
             }
         },
         "/api/service": {
+            "get": {
+                "description": "获取指定命名空间下指定Service的详细信息",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Service 管理"
+                ],
+                "summary": "获取Service详情",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "命名空间",
+                        "name": "namespace",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Service 名称",
+                        "name": "name",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "返回Service的详细信息",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service"
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "500": {
+                        "description": "系统错误(code=30000)",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "创建新的 Service 或更新已存在的 Service",
                 "consumes": [
@@ -1970,63 +2223,6 @@ const docTemplate = `{
                         "description": "删除 Service 成功",
                         "schema": {
                             "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    },
-                    "500": {
-                        "description": "系统错误(code=30000)",
-                        "schema": {
-                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/service/detail": {
-            "get": {
-                "description": "获取指定命名空间下指定Service的详细信息",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Service 管理"
-                ],
-                "summary": "获取Service详情",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "命名空间",
-                        "name": "namespace",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Service 名称",
-                        "name": "name",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "返回Service的详细信息",
-                        "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Service"
-                                        }
-                                    }
-                                }
-                            ]
                         }
                     },
                     "500": {
@@ -2426,6 +2622,32 @@ const docTemplate = `{
                 "type": {
                     "description": "Probe type: tcp | http | command",
                     "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.DaemonSet": {
+            "type": "object",
+            "properties": {
+                "labels": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "selector": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item"
+                    }
+                },
+                "template": {
+                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod"
                 }
             }
         },
@@ -3186,6 +3408,40 @@ const docTemplate = `{
                 },
                 "namespace": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.DaemonSet": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "integer"
+                },
+                "available": {
+                    "description": "表示可用的守护进程副本数，即已经就绪并且可以提供服务的守护进程副本数量",
+                    "type": "integer"
+                },
+                "current": {
+                    "description": "表示当前正在运行的守护进程副本数，即当前在集群中实际运行的守护进程副本数量。",
+                    "type": "integer"
+                },
+                "desired": {
+                    "description": "表示 DaemonSet 所需的守护进程副本数，即期望在集群中运行的守护进程副本数量。",
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "ready": {
+                    "description": "表示已经就绪的守护进程副本数，即当前运行且已准备好接收工作负载的守护进程副本数量。",
+                    "type": "integer"
+                },
+                "upToDate": {
+                    "description": "表示已经更新到最新版本的守护进程副本数，即已经与 DaemonSet 的定义保持一致的守护进程副本数量",
+                    "type": "integer"
                 }
             }
         },

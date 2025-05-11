@@ -28,7 +28,7 @@ func (h *IngressHandler) RegisterRoute(r *gin.Engine) {
 	{
 		ingressGroup.POST("", h.CreateOrUpdateIngress())
 		ingressGroup.DELETE("", h.DeleteIngress())
-		ingressGroup.GET("detail", h.GetIngressDetail())
+		ingressGroup.GET("", h.GetIngressDetail())
 		ingressGroup.GET("list", h.GetIngressList())
 	}
 }
@@ -98,7 +98,7 @@ func (h *IngressHandler) DeleteIngress() gin.HandlerFunc {
 // @Param name query string true "Ingress 名称"
 // @Success 200 {object} response.Response{data=req.Ingress} "返回Ingress的详细信息"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
-// @Router /api/ingress/detail [get]
+// @Router /api/ingress [get]
 func (h *IngressHandler) GetIngressDetail() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Query("name")

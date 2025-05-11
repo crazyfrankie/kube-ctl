@@ -11,7 +11,7 @@ import (
 )
 
 func DeploymentReqConvert(req *req.Deployment) *appsv1.Deployment {
-	affinity, selector, nodeName := getPodNodeScheduling(req.Template.NodeScheduling)
+	pod := PodReqConvert(&req.Template)
 
 	return &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
@@ -25,27 +25,8 @@ func DeploymentReqConvert(req *req.Deployment) *appsv1.Deployment {
 				MatchLabels: utils.ReqItemToMap(req.Selector),
 			},
 			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Name:      req.Template.Base.Name,
-					Namespace: req.Template.Base.Namespace,
-					Labels:    utils.ReqItemToMap(req.Template.Base.Labels),
-				},
-				Spec: corev1.PodSpec{
-					Tolerations:    req.Template.Tolerations,
-					Volumes:        getPodVolumes(req.Template.Volume),
-					InitContainers: getPodContainers(req.Template.InitContainers),
-					Containers:     getPodContainers(req.Template.Containers),
-					HostAliases:    getPodHostAliases(req.Template.Network.HostAliases),
-					Hostname:       req.Template.Network.HostName,
-					DNSConfig: &corev1.PodDNSConfig{
-						Nameservers: req.Template.Network.DnsConfig.Nameservers,
-					},
-					DNSPolicy:     corev1.DNSPolicy(req.Template.Network.DnsPolicy),
-					RestartPolicy: corev1.RestartPolicy(req.Template.Base.RestartPolicy),
-					NodeName:      nodeName,
-					NodeSelector:  selector,
-					Affinity:      affinity,
-				},
+				ObjectMeta: pod.ObjectMeta,
+				Spec:       pod.Spec,
 			},
 		},
 	}
@@ -71,7 +52,7 @@ func DeploymentConvertReq(deploy *appsv1.Deployment) req.Deployment {
 	}
 }
 
-func DeploymentConvertResp(deployment appsv1.Deployment) resp.Deployment {
+func DeploymentConvertResp(deployment *appsv1.Deployment) resp.Deployment {
 	var replicas int32
 	if deployment.Spec.Replicas != nil {
 		replicas = *deployment.Spec.Replicas

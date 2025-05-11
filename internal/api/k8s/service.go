@@ -28,7 +28,7 @@ func (h *ServiceHandler) RegisterRoute(r *gin.Engine) {
 	{
 		serviceGroup.POST("", h.CreateOrUpdateService())
 		serviceGroup.DELETE("", h.DeleteService())
-		serviceGroup.GET("detail", h.GetServiceDetail())
+		serviceGroup.GET("", h.GetServiceDetail())
 		serviceGroup.GET("list", h.GetServiceList())
 	}
 }
@@ -98,7 +98,7 @@ func (h *ServiceHandler) DeleteService() gin.HandlerFunc {
 // @Param name query string true "Service 名称"
 // @Success 200 {object} response.Response{data=req.Service} "返回Service的详细信息"
 // @Failure 500 {object} response.Response "系统错误(code=30000)"
-// @Router /api/service/detail [get]
+// @Router /api/service [get]
 func (h *ServiceHandler) GetServiceDetail() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		name := c.Query("name")
