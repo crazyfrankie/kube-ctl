@@ -49,7 +49,11 @@ func InitServer() *gin.Engine {
 	daemonSetHandler := k8s.NewDaemonSetHandler(daemonSetService)
 	statefulSetService := service.NewStatefulSetService(clientset)
 	statefulSetHandler := k8s.NewStatefulSetHandler(statefulSetService)
-	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler, ingressHandler, ingressRouteHandler, deploymentHandler, daemonSetHandler, statefulSetHandler)
+	jobService := service.NewJobService(clientset)
+	jobHandler := k8s.NewJobHandler(jobService)
+	cronJobService := service.NewCronJobService(clientset)
+	cronJobHandler := k8s.NewCronJobHandler(cronJobService)
+	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler, ingressHandler, ingressRouteHandler, deploymentHandler, daemonSetHandler, statefulSetHandler, jobHandler, cronJobHandler)
 	return engine
 }
 
@@ -80,7 +84,8 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	pvc *k8s.PVCHandler, storage *k8s.StorageClassHandler,
 	svc *k8s.ServiceHandler, ingress *k8s.IngressHandler,
 	igRoute *k8s.IngressRouteHandler, deployment *k8s.DeploymentHandler,
-	daemon *k8s.DaemonSetHandler, stateful *k8s.StatefulSetHandler) *gin.Engine {
+	daemon *k8s.DaemonSetHandler, stateful *k8s.StatefulSetHandler,
+	job *k8s.JobHandler, cron *k8s.CronJobHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 
@@ -97,6 +102,8 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	deployment.RegisterRoute(srv)
 	daemon.RegisterRoute(srv)
 	stateful.RegisterRoute(srv)
+	job.RegisterRoute(srv)
+	cron.RegisterRoute(srv)
 
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	docs.SwaggerInfo.

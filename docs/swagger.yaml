@@ -132,6 +132,35 @@ definitions:
         description: 'Probe type: tcp | http | command'
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.CronJob:
+    properties:
+      concurrencyPolicy:
+        allOf:
+        - $ref: '#/definitions/v1.ConcurrencyPolicy'
+        description: 并发策略
+      failedJobsHistoryLimit:
+        type: integer
+      jobBase:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.JobBase'
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      schedule:
+        description: cron 表达式
+        type: string
+      successfulJobsHistoryLimit:
+        type: integer
+      suspend:
+        description: 是否暂停 cronjob
+        type: boolean
+      template:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod'
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.DaemonSet:
     properties:
       labels:
@@ -298,6 +327,29 @@ definitions:
         type: string
       value:
         type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Job:
+    properties:
+      completions:
+        description: Job 的 Pod 副本数，全部副本数运行成功，才能代表job运行成功
+        type: integer
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      template:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.JobBase:
+    properties:
+      backoffLimit:
+        type: integer
+      completions:
+        type: integer
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.NFSVolumeSource:
     properties:
@@ -669,6 +721,23 @@ definitions:
       namespace:
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.CronJob:
+    properties:
+      active:
+        type: integer
+      age:
+        type: integer
+      lastScheduleTime:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      schedule:
+        type: string
+      suspend:
+        type: boolean
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.DaemonSet:
     properties:
       age:
@@ -741,6 +810,24 @@ definitions:
         type: string
       value:
         type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.Job:
+    properties:
+      age:
+        type: integer
+      completions:
+        description: 控制 Job 成功完成的实例数目的  当指定的实例数目达到 Completions 字段所设定的值时，Job 将被标记为成功完成
+        type: integer
+      duration:
+        description: Job 的持续时间
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      succeeded:
+        description: 就绪的 Job 个数
+        type: integer
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.Namespace:
     properties:
@@ -977,6 +1064,16 @@ definitions:
       msg:
         type: string
     type: object
+  v1.ConcurrencyPolicy:
+    enum:
+    - Allow
+    - Forbid
+    - Replace
+    type: string
+    x-enum-varnames:
+    - AllowConcurrent
+    - ForbidConcurrent
+    - ReplaceConcurrent
   v1.HTTPIngressPath:
     properties:
       backend:
@@ -1439,6 +1536,136 @@ paths:
       summary: 获取ConfigMap列表
       tags:
       - ConfigMap管理
+  /api/cronjob:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定命名空间下的指定CronJob
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: CronJob 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 CronJob
+      tags:
+      - CronJob 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定CronJob的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: CronJob 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回CronJob的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.CronJob'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取CronJob详情
+      tags:
+      - CronJob 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 CronJob 或更新已存在的 CronJob
+      parameters:
+      - description: CronJob 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.CronJob'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 CronJob
+      tags:
+      - CronJob 管理
+  /api/cronjob/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下的所有CronJob列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回CronJob列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.CronJob'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 CronJob 列表
+      tags:
+      - CronJob 管理
   /api/daemonset:
     delete:
       consumes:
@@ -1991,6 +2218,136 @@ paths:
       summary: 获取IngressRoute的Middlewares列表
       tags:
       - IngressRoute 管理
+  /api/job:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定命名空间下的指定Job
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Job 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 Job
+      tags:
+      - Job 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定Job的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Job 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Job的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Job'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Job详情
+      tags:
+      - Job 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 Job 或更新已存在的 Job
+      parameters:
+      - description: Job 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Job'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 Job
+      tags:
+      - Job 管理
+  /api/job/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下的所有Job列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Job列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Job'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取Job列表
+      tags:
+      - Job 管理
   /api/node:
     get:
       consumes:

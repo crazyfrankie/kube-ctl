@@ -1,12 +1,12 @@
 package convert
 
 import (
-	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 

@@ -20,6 +20,9 @@ Gin + [kubernetes/client-go](https://github.com/kubernetes/client-go)
 - [x] IngressRoute 创建、更新、删除、查询
 - [x] Deployment 创建、更新、删除、查询（详情和列表）
 - [x] DaemonSet 创建、更新、删除、查询（详情和列表）
+- [x] StatefulSet 创建、更新、删除、查询（详情和列表）
+- [x] Job 创建、更新、删除、查询（详情和列表）
+- [x] CronJob 创建、更新、删除、查询（详情和列表）
 
 ## 启动
 ### v1:
