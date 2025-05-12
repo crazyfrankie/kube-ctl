@@ -2,12 +2,13 @@ package service
 
 import (
 	"context"
-	"github.com/crazyfrankie/kube-ctl/internal/model/convert"
-	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+
 	appsv1 "k8s.io/api/apps/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
 	"k8s.io/client-go/kubernetes"
+
+	"github.com/crazyfrankie/kube-ctl/internal/model/convert"
+	"github.com/crazyfrankie/kube-ctl/internal/model/req"
 )
 
 type DaemonSetService interface {

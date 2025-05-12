@@ -530,6 +530,31 @@ definitions:
       targetPort:
         type: integer
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.StatefulSet:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      replicas:
+        type: integer
+      selector:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      serviceName:
+        type: string
+      template:
+        $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Pod'
+      volumeClaimTemplates:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.PersistentVolumeClaim'
+        type: array
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.StorageClass:
     properties:
       allowVolumeExpansion:
@@ -903,6 +928,19 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/v1.ServiceType'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.StatefulSet:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+      ready:
+        type: integer
+      replicas:
+        type: integer
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.StorageClass:
     properties:
@@ -2714,6 +2752,136 @@ paths:
       summary: 获取Service列表
       tags:
       - Service 管理
+  /api/statefulset:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定命名空间下的指定 StatefulSet
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: StatefulSet 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 StatefulSet
+      tags:
+      - StatefulSet 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下指定StatefulSet的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: StatefulSet 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回StatefulSet的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.StatefulSet'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取StatefulSet详情
+      tags:
+      - StatefulSet 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建新的 StatefulSet 或更新已存在的 StatefulSet
+      parameters:
+      - description: StatefulSet 配置信息
+        in: body
+        name: pod
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.StatefulSet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 操作成功，返回成功消息
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 StatefulSet
+      tags:
+      - StatefulSet 管理
+  /api/statefulset/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取指定命名空间下的所有StatefulSet列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回StatefulSet列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.StatefulSet'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取StatefulSet列表
+      tags:
+      - StatefulSet 管理
   /api/storage:
     delete:
       consumes:

@@ -53,14 +53,10 @@ func DeploymentConvertReq(deploy *appsv1.Deployment) req.Deployment {
 }
 
 func DeploymentConvertResp(deployment *appsv1.Deployment) resp.Deployment {
-	var replicas int32
-	if deployment.Spec.Replicas != nil {
-		replicas = *deployment.Spec.Replicas
-	}
 	return resp.Deployment{
 		Name:      deployment.Name,
 		Namespace: deployment.Namespace,
-		Replicas:  replicas,
+		Replicas:  deployment.Status.Replicas,
 		Ready:     deployment.Status.ReadyReplicas,
 		UpToDate:  deployment.Status.UpdatedReplicas,
 		Available: deployment.Status.AvailableReplicas,
