@@ -29,8 +29,9 @@ func NewDeploymentService(cs *kubernetes.Clientset) DeploymentService {
 func (s *deploymentService) CreateOrUpdateDeployment(ctx context.Context, req *req.Deployment) error {
 	deployment := convert.DeploymentReqConvert(req)
 
-	if _, err := s.clientSet.AppsV1().Deployments(deployment.Namespace).Get(ctx, deployment.Name, metav1.GetOptions{}); err == nil {
-		_, err := s.clientSet.AppsV1().Deployments(deployment.Namespace).Update(ctx, deployment, metav1.UpdateOptions{})
+	if exists, err := s.clientSet.AppsV1().Deployments(deployment.Namespace).Get(ctx, deployment.Name, metav1.GetOptions{}); err == nil {
+		exists.Spec = deployment.Spec
+		_, err := s.clientSet.AppsV1().Deployments(deployment.Namespace).Update(ctx, exists, metav1.UpdateOptions{})
 
 		return err
 	}

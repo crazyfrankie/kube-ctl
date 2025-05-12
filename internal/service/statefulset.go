@@ -29,8 +29,9 @@ func NewStatefulSetService(cs *kubernetes.Clientset) StatefulSetService {
 func (s *statefulSetService) CreateOrUpdateStatefulSet(ctx context.Context, req *req.StatefulSet) error {
 	stateful := convert.StatefulSetReqConvert(req)
 
-	if _, err := s.clientSet.AppsV1().StatefulSets(stateful.Namespace).Get(ctx, stateful.Name, metav1.GetOptions{}); err != nil {
-		_, err := s.clientSet.AppsV1().StatefulSets(stateful.Namespace).Create(ctx, stateful, metav1.CreateOptions{})
+	if exists, err := s.clientSet.AppsV1().StatefulSets(stateful.Namespace).Get(ctx, stateful.Name, metav1.GetOptions{}); err != nil {
+		exists.Spec = stateful.Spec
+		_, err := s.clientSet.AppsV1().StatefulSets(stateful.Namespace).Create(ctx, exists, metav1.CreateOptions{})
 
 		return err
 	}

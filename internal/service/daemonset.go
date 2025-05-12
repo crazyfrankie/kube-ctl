@@ -29,8 +29,9 @@ func NewDaemonSetService(cs *kubernetes.Clientset) DaemonSetService {
 func (s *daemonSetService) CreateOrUpdateDaemonSet(ctx context.Context, req *req.DaemonSet) error {
 	daemon := convert.DaemonSetReqConvert(req)
 
-	if _, err := s.clientSet.AppsV1().DaemonSets(daemon.Namespace).Get(ctx, daemon.Name, metav1.GetOptions{}); err == nil {
-		_, err := s.clientSet.AppsV1().DaemonSets(daemon.Namespace).Update(ctx, daemon, metav1.UpdateOptions{})
+	if exists, err := s.clientSet.AppsV1().DaemonSets(daemon.Namespace).Get(ctx, daemon.Name, metav1.GetOptions{}); err == nil {
+		exists.Spec = daemon.Spec
+		_, err := s.clientSet.AppsV1().DaemonSets(daemon.Namespace).Update(ctx, exists, metav1.UpdateOptions{})
 
 		return err
 	}

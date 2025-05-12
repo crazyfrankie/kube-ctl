@@ -29,8 +29,9 @@ func NewServiceService(cs *kubernetes.Clientset) SvcService {
 func (s *svcService) CreateOrUpdateService(ctx context.Context, req *req.Service) error {
 	svc := convert.ServiceReqConvert(req)
 
-	if _, err := s.clientSet.CoreV1().Services(svc.Namespace).Get(ctx, svc.Name, metav1.GetOptions{}); err == nil {
-		_, err := s.clientSet.CoreV1().Services(svc.Namespace).Update(ctx, svc, metav1.UpdateOptions{})
+	if exists, err := s.clientSet.CoreV1().Services(svc.Namespace).Get(ctx, svc.Name, metav1.GetOptions{}); err == nil {
+		exists.Spec = svc.Spec
+		_, err := s.clientSet.CoreV1().Services(svc.Namespace).Update(ctx, exists, metav1.UpdateOptions{})
 
 		return err
 	}

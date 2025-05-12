@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"fmt"
-	"k8s.io/apimachinery/pkg/api/errors"
 
 	"github.com/bytedance/sonic"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
@@ -66,14 +66,25 @@ func (s *ingressRouteService) CreateOrUpdateIngressRoute(ctx context.Context, re
 	}
 	url := fmt.Sprintf("/apis/traefik.io/v1alpha1/namespaces/%s/ingressroutes/%s", ig.Metadata.Namespace, ig.Metadata.Name)
 
-	raw, _ := sonic.Marshal(ig)
-	if _, err := s.clientSet.NetworkingV1().RESTClient().Get().AbsPath(url).DoRaw(ctx); err == nil {
-		_, err = s.clientSet.NetworkingV1().RESTClient().Put().AbsPath(url).Body(raw).DoRaw(ctx)
+	result, _ := sonic.Marshal(ig)
+	if raw, err := s.clientSet.NetworkingV1().RESTClient().Get().AbsPath(url).DoRaw(ctx); err == nil {
+		var ingre IngressRoute
+		err := sonic.Unmarshal(raw, &ingre)
+		if err != nil {
+			return err
+		}
+		// update
+		ingre.Spec = ig.Spec
+		result, err := sonic.Marshal(ingre)
+		if err != nil {
+			return err
+		}
+		_, err = s.clientSet.NetworkingV1().RESTClient().Put().AbsPath(url).Body(result).DoRaw(ctx)
 
 		return err
 	}
 
-	_, err := s.clientSet.NetworkingV1().RESTClient().Post().AbsPath(url).Body(raw).DoRaw(ctx)
+	_, err := s.clientSet.NetworkingV1().RESTClient().Post().AbsPath(url).Body(result).DoRaw(ctx)
 
 	return err
 }
