@@ -16,9 +16,15 @@ type Role struct {
 }
 
 type RoleBinding struct {
-	Name      string           `json:"name"`
-	Namespace string           `json:"namespace"` // Namespace == "" ?  ClusterRoleBinding: RoleBinding
-	Labels    []Item           `json:"labels"`
-	RoleRef   string           `json:"roleRef"`
-	Subjects  []ServiceAccount `json:"subjects"`
+	Name      string    `json:"name"`
+	Namespace string    `json:"namespace"` // Namespace == "" ?  ClusterRoleBinding: RoleBinding
+	Labels    []Item    `json:"labels"`
+	RoleRef   string    `json:"roleRef"`
+	Subjects  []Subject `json:"subjects"`
+}
+
+type Subject struct {
+	Name      string `json:"name"`
+	Namespace string `json:"namespace"`
+	Kind      string `json:"kind"`
 }

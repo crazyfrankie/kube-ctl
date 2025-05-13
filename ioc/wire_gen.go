@@ -15,14 +15,16 @@ import (
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+	"os"
 )
 
 // Injectors from wire.go:
 
 func InitServer() *gin.Engine {
 	v := InitMws()
-	clientset := InitKubernetes()
+	clientset := InitKubernetesWithDiscovery()
 	podService := service.NewPodService(clientset)
 	podHandler := k8s.NewPodHandler(podService)
 	nodeService := service.NewNodeService(clientset)
@@ -75,6 +77,34 @@ func InitKubernetes() *kubernetes.Clientset {
 	}
 
 	return clientSet
+}
+
+func InitKubernetesWithDiscovery() *kubernetes.Clientset {
+	if isInCluster() {
+		cfg, err := rest.InClusterConfig()
+		if err != nil {
+			panic(err)
+		}
+		clientSet, err := kubernetes.NewForConfig(cfg)
+		if err != nil {
+			panic(err)
+		}
+
+		return clientSet
+	} else {
+		return InitKubernetes()
+	}
+}
+
+func isInCluster() bool {
+	tokenFile := "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+	_, err := os.Stat(tokenFile)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func InitMws() []gin.HandlerFunc {

@@ -1,12 +1,12 @@
 package convert
 
 import (
-	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/crazyfrankie/kube-ctl/internal/model/req"
+	"github.com/crazyfrankie/kube-ctl/internal/model/resp"
 	"github.com/crazyfrankie/kube-ctl/pkg/utils"
 )
 
@@ -72,11 +72,11 @@ func ClusterRoleBindingReqConvert(req *req.RoleBinding) *rbacv1.ClusterRoleBindi
 	}
 }
 
-func getReqRoleBindingSubjects(subjects []req.ServiceAccount) []rbacv1.Subject {
+func getReqRoleBindingSubjects(subjects []req.Subject) []rbacv1.Subject {
 	res := make([]rbacv1.Subject, 0, len(subjects))
 	for _, s := range subjects {
 		res = append(res, rbacv1.Subject{
-			Kind:      "User",
+			Kind:      s.Kind,
 			Name:      s.Name,
 			Namespace: s.Namespace,
 		})
@@ -123,12 +123,13 @@ func ClusterRoleBindingConvertReq(role *rbacv1.ClusterRoleBinding) req.RoleBindi
 	}
 }
 
-func getRoleBindingSubjectsReq(subjects []rbacv1.Subject) []req.ServiceAccount {
-	res := make([]req.ServiceAccount, 0, len(subjects))
+func getRoleBindingSubjectsReq(subjects []rbacv1.Subject) []req.Subject {
+	res := make([]req.Subject, 0, len(subjects))
 	for _, s := range subjects {
-		res = append(res, req.ServiceAccount{
+		res = append(res, req.Subject{
 			Name:      s.Name,
 			Namespace: s.Namespace,
+			Kind:      s.Kind,
 		})
 	}
 

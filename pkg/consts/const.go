@@ -7,4 +7,6 @@ const (
 	RestartPolicyAlways         = "Always"
 	RestartPolicyNever          = "Never"
 	RestartPolicyOnFailure      = "On-Failure"
+
+	TokenTypeFile = "file"
 )

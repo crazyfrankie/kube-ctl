@@ -27,11 +27,20 @@ Gin + [kubernetes/client-go](https://github.com/kubernetes/client-go)
 - [x] StatefulSet 创建、更新、删除、查询（详情和列表）
 - [x] Job 创建、更新、删除、查询（详情和列表）
 - [x] CronJob 创建、更新、删除、查询（详情和列表）
+- [x] ServiceAccount 创建、更新、删除、查询（详情和列表）
+- [x] Role | ClusterRole 创建、更新、删除、查询（详情和列表）
+- [x] RoleBinding | ClusterRoleBinding 创建、更新、删除、查询（详情和列表）
 
 ## 启动
 ### v1:
+项目在开发和测试阶段, 均以集群外的方式访问, 需按照下面的步骤进行启动
 1. 在项目根目录下新建 `.kube` 文件夹, 将集群中 `control-plane` 机器上的 `~/.kube/config` 复制到文件夹下
 2. 参照 `conf/test/example.yaml` 修改对应配置
+### v2:
+服务内置发现机制
+- 动态判断是集群外访问还是集群内访问
+- 若为集群外, 走默认路径, 用户仍需参照 v1 进行配置
+- 若为集群内, 走集群内访问机制
 
 ## 项目前端
 [kube-ctl-web](https://github.com/crazyfrankie/kube-ctl-web)

@@ -3,16 +3,20 @@
 package ioc
 
 import (
-	"github.com/crazyfrankie/kube-ctl/docs"
-	"github.com/crazyfrankie/kube-ctl/internal/api/k8s"
-	"github.com/crazyfrankie/kube-ctl/internal/api/mw"
-	"github.com/crazyfrankie/kube-ctl/internal/service"
+	"os"
+
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
+
+	"github.com/crazyfrankie/kube-ctl/docs"
+	"github.com/crazyfrankie/kube-ctl/internal/api/k8s"
+	"github.com/crazyfrankie/kube-ctl/internal/api/mw"
+	"github.com/crazyfrankie/kube-ctl/internal/service"
 )
 
 func InitKubernetes() *kubernetes.Clientset {
@@ -30,6 +34,34 @@ func InitKubernetes() *kubernetes.Clientset {
 	}
 
 	return clientSet
+}
+
+func InitKubernetesWithDiscovery() *kubernetes.Clientset {
+	if isInCluster() {
+		cfg, err := rest.InClusterConfig()
+		if err != nil {
+			panic(err)
+		}
+		clientSet, err := kubernetes.NewForConfig(cfg)
+		if err != nil {
+			panic(err)
+		}
+
+		return clientSet
+	} else {
+		return InitKubernetes()
+	}
+}
+
+func isInCluster() bool {
+	tokenFile := "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
+	_, err := os.Stat(tokenFile)
+	if err != nil {
+		return false
+	}
+
+	return true
 }
 
 func InitMws() []gin.HandlerFunc {
@@ -76,7 +108,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 func InitServer() *gin.Engine {
 	wire.Build(
 		InitMws,
-		InitKubernetes,
+		InitKubernetesWithDiscovery,
 
 		service.NewPodService,
 		service.NewNodeService,

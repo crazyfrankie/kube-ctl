@@ -16,7 +16,6 @@ LABEL MAINTAINER="axu9417@gmail.com"
 
 WORKDIR /app
 COPY --from=0 /app/conf/test/conf.yaml ./conf/test/conf.yaml
-COPY --from=0 /app/.kube/config ./.kube/config
 COPY --from=0 /app/server ./
 
 EXPOSE 8083
