@@ -555,7 +555,7 @@ definitions:
         type: string
       subjects:
         items:
-          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServiceAccount'
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Subject'
         type: array
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Secret:
@@ -681,6 +681,15 @@ definitions:
         description: Delete | Retain
       volumeBindingMode:
         $ref: '#/definitions/v1.VolumeBindingMode'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Subject:
+    properties:
+      kind:
+        type: string
+      name:
+        type: string
+      namespace:
+        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.UpdateLabelReq:
     properties:

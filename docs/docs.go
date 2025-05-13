@@ -4438,7 +4438,7 @@ const docTemplate = `{
                 "subjects": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServiceAccount"
+                        "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Subject"
                     }
                 }
             }
@@ -4633,6 +4633,20 @@ const docTemplate = `{
                 },
                 "volumeBindingMode": {
                     "$ref": "#/definitions/v1.VolumeBindingMode"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_req.Subject": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
                 }
             }
         },
