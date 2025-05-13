@@ -524,6 +524,40 @@ definitions:
       memoryLimit:
         type: integer
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.Role:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        description: 'Namespace == "" ? ClusterRole : Role'
+        type: string
+      rules:
+        items:
+          $ref: '#/definitions/v1.PolicyRule'
+        type: array
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.RoleBinding:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        description: 'Namespace == "" ?  ClusterRoleBinding: RoleBinding'
+        type: string
+      roleRef:
+        type: string
+      subjects:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServiceAccount'
+        type: array
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.Secret:
     properties:
       data:
@@ -570,6 +604,17 @@ definitions:
         type: array
       type:
         $ref: '#/definitions/v1.ServiceType'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_req.ServiceAccount:
+    properties:
+      labels:
+        items:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Item'
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_req.ServicePort:
     properties:
@@ -965,6 +1010,24 @@ definitions:
         description: Running | Error
         type: string
     type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.Role:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.RoleBinding:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
+    type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.Secret:
     properties:
       age:
@@ -1015,6 +1078,15 @@ definitions:
         type: string
       type:
         $ref: '#/definitions/v1.ServiceType'
+    type: object
+  github_com_crazyfrankie_kube-ctl_internal_model_resp.ServiceAccount:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+      namespace:
+        type: string
     type: object
   github_com_crazyfrankie_kube-ctl_internal_model_resp.StatefulSet:
     properties:
@@ -1251,6 +1323,51 @@ definitions:
     - PersistentVolumeReclaimRecycle
     - PersistentVolumeReclaimDelete
     - PersistentVolumeReclaimRetain
+  v1.PolicyRule:
+    properties:
+      apiGroups:
+        description: |-
+          APIGroups is the name of the APIGroup that contains the resources.  If multiple API groups are specified, any action requested against one of
+          the enumerated resources in any API group will be allowed. "" represents the core API group and "*" represents all API groups.
+          +optional
+          +listType=atomic
+        items:
+          type: string
+        type: array
+      nonResourceURLs:
+        description: |-
+          NonResourceURLs is a set of partial urls that a user should have access to.  *s are allowed, but only as the full, final step in the path
+          Since non-resource URLs are not namespaced, this field is only applicable for ClusterRoles referenced from a ClusterRoleBinding.
+          Rules can either apply to API resources (such as "pods" or "secrets") or non-resource URL paths (such as "/api"),  but not both.
+          +optional
+          +listType=atomic
+        items:
+          type: string
+        type: array
+      resourceNames:
+        description: |-
+          ResourceNames is an optional white list of names that the rule applies to.  An empty set means that everything is allowed.
+          +optional
+          +listType=atomic
+        items:
+          type: string
+        type: array
+      resources:
+        description: |-
+          Resources is a list of resources this rule applies to. '*' represents all resources.
+          +optional
+          +listType=atomic
+        items:
+          type: string
+        type: array
+      verbs:
+        description: |-
+          Verbs is a list of Verbs that apply to ALL the ResourceKinds contained in this rule. '*' represents all verbs.
+          +listType=atomic
+        items:
+          type: string
+        type: array
+    type: object
   v1.SecretType:
     enum:
     - Opaque
@@ -2854,6 +2971,361 @@ paths:
       summary: 创建 PVC
       tags:
       - PVC 管理
+  /api/rbac/rb:
+    delete:
+      consumes:
+      - application/json
+      description: 删除 RoleBinding | ClusterRoleBinding 规则与用户绑定信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: RoleBinding 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 RoleBinding 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 RoleBinding | ClusterRoleBinding
+      tags:
+      - RBAC 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取 RoleBinding 的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Role 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回 RoleBinding 的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.RoleBinding'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 RoleBinding 详情
+      tags:
+      - RBAC 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建或更新 RoleBinding | ClusterRoleBinding 将用户与规则绑定
+      parameters:
+      - description: RoleBinding | ClusterRoleBinding 用户与规则绑定信息
+        in: body
+        name: roleBinding
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.RoleBinding'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建或更新 RB 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 RoleBinding | ClusterRoleBinding
+      tags:
+      - RBAC 管理
+  /api/rbac/rb/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有 RoleBinding 列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回 Role 列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.RoleBinding'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 RoleBinding 列表
+      tags:
+      - RBAC 管理
+  /api/rbac/role:
+    delete:
+      consumes:
+      - application/json
+      description: 删除 Role | ClusterRole 用户访问规则
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Role 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 Role 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 Role | ClusterRole
+      tags:
+      - RBAC 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取 Role 的详细信息
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: Role 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回Role的详细信息
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Role'
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 Role 详情
+      tags:
+      - RBAC 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建或更新 Role | ClusterRole 作为用户访问规则
+      parameters:
+      - description: Role | ClusterRole 规则信息
+        in: body
+        name: role
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.Role'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建或更新 Role 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建或更新 Role | ClusterRole
+      tags:
+      - RBAC 管理
+  /api/rbac/role/list:
+    get:
+      consumes:
+      - application/json
+      description: 获取所有 Role 列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回 Role 列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.Role'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 Role 列表
+      tags:
+      - RBAC 管理
+  /api/rbac/sa:
+    delete:
+      consumes:
+      - application/json
+      description: 删除 ServiceAccount 用户访问集群账号
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: ServiceAccount 名称
+        in: query
+        name: name
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除 Role 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 删除 ServiceAccount
+      tags:
+      - RBAC 管理
+    get:
+      consumes:
+      - application/json
+      description: 获取所有 ServiceAccount 列表
+      parameters:
+      - description: 命名空间
+        in: query
+        name: namespace
+        required: true
+        type: string
+      - description: 关键词
+        in: query
+        name: keyword
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 返回 ServiceAccount 列表
+          schema:
+            allOf:
+            - $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+            - properties:
+                data:
+                  items:
+                    $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.ServiceAccount'
+                  type: array
+              type: object
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 获取 ServiceAccount 列表
+      tags:
+      - RBAC 管理
+    post:
+      consumes:
+      - application/json
+      description: 创建一个 ServiceAccount 以进行用户认证
+      parameters:
+      - description: ServiceAccount 信息
+        in: body
+        name: serviceAccount
+        required: true
+        schema:
+          $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_req.ServiceAccount'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 创建 SA 成功
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "400":
+          description: 参数错误(code=20001)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+        "500":
+          description: 系统错误(code=30000)
+          schema:
+            $ref: '#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response'
+      summary: 创建 ServiceAccount
+      tags:
+      - RBAC 管理
   /api/secret:
     delete:
       consumes:

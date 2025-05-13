@@ -1,6 +1,10 @@
 # Kube-ctl
 Kube-ctl 是 kubernetes 的一个可视化系统. 提供给用户一系列方式操作 kubernetes 集群
 
+本项目是一个严格意义上的 CRUD 项目, 但侧重点在于学习 kubernetes 整个系统的组成. 
+
+阅读[官方文档](https://kubernetes.io/docs)、阅读 [k8s](https://github.com/kubernetes/kubernetes) 源码是本项目的核心
+
 ## 技术栈
 Gin + [kubernetes/client-go](https://github.com/kubernetes/client-go)
 

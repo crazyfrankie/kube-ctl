@@ -24,7 +24,7 @@ func NewCronJobHandler(svc service.CronJobService) *CronJobHandler {
 }
 
 func (h *CronJobHandler) RegisterRoute(r *gin.Engine) {
-	cronCronJobGroup := r.Group("api/cronCronJob")
+	cronCronJobGroup := r.Group("api/cronjob")
 	{
 		cronCronJobGroup.POST("", h.CreateOrUpdateCronJob())
 		cronCronJobGroup.DELETE("", h.DeleteCronJob())
