@@ -3,21 +3,31 @@
 package ioc
 
 import (
+	"fmt"
+	"github.com/crazyfrankie/kube-ctl/internal/metrics"
 	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	promapi "github.com/prometheus/client_golang/api"
+	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
+	"github.com/crazyfrankie/kube-ctl/conf"
 	"github.com/crazyfrankie/kube-ctl/docs"
 	"github.com/crazyfrankie/kube-ctl/internal/api/k8s"
 	"github.com/crazyfrankie/kube-ctl/internal/api/mw"
 	"github.com/crazyfrankie/kube-ctl/internal/service"
 )
+
+type App struct {
+	Engine  *gin.Engine
+	Metrics *metrics.MetricsHandler
+}
 
 func InitKubernetes() *kubernetes.Clientset {
 	kubeConfig := ".kube/config"
@@ -64,6 +74,17 @@ func isInCluster() bool {
 	return true
 }
 
+func InitPromAPI() promv1.API {
+	client, err := promapi.NewClient(promapi.Config{
+		Address: fmt.Sprintf("%s://%s", conf.GetConf().Prom.Scheme, conf.GetConf().Prom.Host),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return promv1.NewAPI(client)
+}
+
 func InitMws() []gin.HandlerFunc {
 	return []gin.HandlerFunc{
 		mw.CORS(),
@@ -77,7 +98,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	igRoute *k8s.IngressRouteHandler, deployment *k8s.DeploymentHandler,
 	daemon *k8s.DaemonSetHandler, stateful *k8s.StatefulSetHandler,
 	job *k8s.JobHandler, cron *k8s.CronJobHandler,
-	rbac *k8s.RbacHandler) *gin.Engine {
+	rbac *k8s.RbacHandler, metrics *k8s.MetricsHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 
@@ -97,6 +118,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	job.RegisterRoute(srv)
 	cron.RegisterRoute(srv)
 	rbac.RegisterRoute(srv)
+	metrics.RegisterRoute(srv)
 
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
@@ -105,10 +127,11 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	return srv
 }
 
-func InitServer() *gin.Engine {
+func InitApp() *App {
 	wire.Build(
 		InitMws,
 		InitKubernetesWithDiscovery,
+		InitPromAPI,
 
 		service.NewPodService,
 		service.NewNodeService,
@@ -126,6 +149,7 @@ func InitServer() *gin.Engine {
 		service.NewJobService,
 		service.NewCronJobService,
 		service.NewRbacService,
+		service.NewMetricsService,
 		k8s.NewPodHandler,
 		k8s.NewNodeHandler,
 		k8s.NewConfigMapHandler,
@@ -142,8 +166,12 @@ func InitServer() *gin.Engine {
 		k8s.NewJobHandler,
 		k8s.NewCronJobHandler,
 		k8s.NewRbacHandler,
+		k8s.NewMetricsHandler,
 
 		InitGin,
+		metrics.NewMetricsHandler,
+
+		wire.Struct(new(App), "*"),
 	)
-	return new(gin.Engine)
+	return new(App)
 }

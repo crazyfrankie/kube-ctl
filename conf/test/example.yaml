@@ -1,6 +1,11 @@
 server:
   addr: "your-port"
 
+prom:
+  # http | https
+  scheme:
+  host: "your-prometheus host"
+
 storageClass:
   provisioner:
     - "your-provisioner"

@@ -15,11 +15,17 @@ var (
 
 type Config struct {
 	Server       Server       `yaml:"server"`
+	Prom         Prom         `json:"prom"`
 	StorageClass StorageClass `yaml:"storageClass"`
 }
 
 type Server struct {
 	Addr string `yaml:"addr"`
+}
+
+type Prom struct {
+	Scheme string `json:"scheme"`
+	Host   string `json:"host"`
 }
 
 type StorageClass struct {

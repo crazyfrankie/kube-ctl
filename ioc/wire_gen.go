@@ -7,11 +7,16 @@
 package ioc
 
 import (
+	"fmt"
+	"github.com/crazyfrankie/kube-ctl/conf"
 	"github.com/crazyfrankie/kube-ctl/docs"
 	"github.com/crazyfrankie/kube-ctl/internal/api/k8s"
 	"github.com/crazyfrankie/kube-ctl/internal/api/mw"
+	"github.com/crazyfrankie/kube-ctl/internal/metrics"
 	"github.com/crazyfrankie/kube-ctl/internal/service"
 	"github.com/gin-gonic/gin"
+	"github.com/prometheus/client_golang/api"
+	"github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
 	"k8s.io/client-go/kubernetes"
@@ -22,7 +27,7 @@ import (
 
 // Injectors from wire.go:
 
-func InitServer() *gin.Engine {
+func InitApp() *App {
 	v := InitMws()
 	clientset := InitKubernetesWithDiscovery()
 	podService := service.NewPodService(clientset)
@@ -57,11 +62,24 @@ func InitServer() *gin.Engine {
 	cronJobHandler := k8s.NewCronJobHandler(cronJobService)
 	rbacService := service.NewRbacService(clientset)
 	rbacHandler := k8s.NewRbacHandler(rbacService)
-	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler, ingressHandler, ingressRouteHandler, deploymentHandler, daemonSetHandler, statefulSetHandler, jobHandler, cronJobHandler, rbacHandler)
-	return engine
+	api := InitPromAPI()
+	metricsService := service.NewMetricsService(clientset, api)
+	metricsHandler := k8s.NewMetricsHandler(metricsService)
+	engine := InitGin(v, podHandler, nodeHandler, configMapHandler, secretHandler, pvHandler, pvcHandler, storageClassHandler, serviceHandler, ingressHandler, ingressRouteHandler, deploymentHandler, daemonSetHandler, statefulSetHandler, jobHandler, cronJobHandler, rbacHandler, metricsHandler)
+	metricsMetricsHandler := metrics.NewMetricsHandler(metricsService)
+	app := &App{
+		Engine:  engine,
+		Metrics: metricsMetricsHandler,
+	}
+	return app
 }
 
 // wire.go:
+
+type App struct {
+	Engine  *gin.Engine
+	Metrics *metrics.MetricsHandler
+}
 
 func InitKubernetes() *kubernetes.Clientset {
 	kubeConfig := ".kube/config"
@@ -107,6 +125,17 @@ func isInCluster() bool {
 	return true
 }
 
+func InitPromAPI() v1.API {
+	client, err := api.NewClient(api.Config{
+		Address: fmt.Sprintf("%s://%s", conf.GetConf().Prom.Scheme, conf.GetConf().Prom.Host),
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return v1.NewAPI(client)
+}
+
 func InitMws() []gin.HandlerFunc {
 	return []gin.HandlerFunc{mw.CORS()}
 }
@@ -118,7 +147,7 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	igRoute *k8s.IngressRouteHandler, deployment *k8s.DeploymentHandler,
 	daemon *k8s.DaemonSetHandler, stateful *k8s.StatefulSetHandler,
 	job *k8s.JobHandler, cron *k8s.CronJobHandler,
-	rbac *k8s.RbacHandler) *gin.Engine {
+	rbac *k8s.RbacHandler, metrics2 *k8s.MetricsHandler) *gin.Engine {
 	srv := gin.Default()
 	srv.Use(mws...)
 
@@ -138,6 +167,8 @@ func InitGin(mws []gin.HandlerFunc, pod *k8s.PodHandler, node *k8s.NodeHandler,
 	job.RegisterRoute(srv)
 	cron.RegisterRoute(srv)
 	rbac.RegisterRoute(srv)
+	metrics2.
+		RegisterRoute(srv)
 
 	srv.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	docs.SwaggerInfo.
