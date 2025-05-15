@@ -339,7 +339,7 @@ func (s *metricsService) GetClusterUsageRange(ctx context.Context) ([]resp.Metri
 		Title: "CPU changing trend",
 		Value: cpu,
 	})
-	mem, err := s.getMetricsFromProm("cluster_cpu")
+	mem, err := s.getMetricsFromProm("cluster_mem")
 	if err != nil {
 		return metrics, err
 	}
