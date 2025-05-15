@@ -1,0 +1,44 @@
+kind: pipeline
+type: docker
+name: kube-ctl-server-publish
+steps:
+  - name: build
+    image: plugins/docker:20.14.2
+    volumes:
+      - name: hosts
+        path: /etc/hosts
+      - name: docker-ca
+        path: /etc/docker
+      - name: dockersock
+        path: /var/run/docker.sock
+    settings:
+      username: admin
+      password:
+        from_secret: harbor_password
+      repo: harbor.cfckube.com/kubefrank/kube-ctl-server
+      registry: harbor.cfckube.com
+      tags:
+        - v1.0
+  - name: ssh commands
+    image: appleboy/drone-ssh:1.6.13
+    settings:
+      host: 172.20.2.17
+      username: root
+      password:
+        from_secret: ssh_password
+      port: 22
+      script:
+        #拉取镜像并重启 注意--需要提前在目标主机完成docker login
+        - if [ $(docker ps -a | grep kube-ctl-server | wc -l) -ge 1 ];then docker stop kube-ctl-server && docker rm kube-ctl-server; fi
+        - docker pull harbor.cfckube.com/kubefrank/kube-ctl-server:v1.0
+        - docker run --name kube-ctl-server --restart=always -d -p 8083:8083 harbor.cfckube.com/kubefrank/kube-ctl-server:v1.0
+volumes:
+  - name: hosts
+    host:
+      path: /etc/hosts
+  - name: docker-ca
+    host:
+      path: /etc/docker
+  - name: dockersock
+    host:
+      path: /var/run/docker.sock
