@@ -20,5 +20,6 @@ COPY --from=0 /app/.kube/config ./.kube/config
 COPY --from=0 /app/server ./
 
 EXPOSE 8083
+EXPOSE 8082
 
 ENTRYPOINT ./server
