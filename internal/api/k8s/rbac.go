@@ -220,9 +220,9 @@ func (h *RbacHandler) GetRoleDetail() gin.HandlerFunc {
 
 		var res req.Role
 		if ns == "" {
-			res = convert.RoleConvertReq(role)
-		} else {
 			res = convert.ClusterRoleConvertReq(cluster)
+		} else {
+			res = convert.RoleConvertReq(role)
 		}
 
 		response.SuccessWithData(c, res)
@@ -355,9 +355,9 @@ func (h *RbacHandler) GetRoleBindingDetail() gin.HandlerFunc {
 
 		var res req.RoleBinding
 		if ns == "" {
-			res = convert.RoleBindingConvertReq(role)
-		} else {
 			res = convert.ClusterRoleBindingConvertReq(cluster)
+		} else {
+			res = convert.RoleBindingConvertReq(role)
 		}
 
 		response.SuccessWithData(c, res)
