@@ -627,6 +627,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/dashboard": {
+            "get": {
+                "description": "获取集群Metrics信息构建Dashboard界面",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Metrics 管理"
+                ],
+                "summary": "获取集群Metrics信息",
+                "responses": {
+                    "200": {
+                        "description": "获取集群信息成功",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "获取集群信息失败",
+                        "schema": {
+                            "allOf": [
+                                {
+                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_pkg_response.Response"
+                                },
+                                {
+                                    "type": "object",
+                                    "properties": {
+                                        "data": {
+                                            "type": "object",
+                                            "additionalProperties": {
+                                                "type": "array",
+                                                "items": {
+                                                    "$ref": "#/definitions/github_com_crazyfrankie_kube-ctl_internal_model_resp.MetricsItem"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
         "/api/deployment": {
             "get": {
                 "description": "获取指定命名空间下指定Deployment的详细信息",
@@ -4935,6 +4982,23 @@ const docTemplate = `{
                 "succeeded": {
                     "description": "就绪的 Job 个数",
                     "type": "integer"
+                }
+            }
+        },
+        "github_com_crazyfrankie_kube-ctl_internal_model_resp.MetricsItem": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "label": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
                 }
             }
         },
