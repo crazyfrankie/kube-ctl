@@ -1,3 +1,9 @@
 .idea/
 
 k8s-use/
+
+.kube/
+
+config
+
+conf.yaml
