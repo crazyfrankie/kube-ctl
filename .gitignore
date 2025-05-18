@@ -2,8 +2,8 @@
 
 k8s-use/
 
-.kube/
+#.kube/
 
-config
+#config
 
-conf.yaml
+#conf.yaml
