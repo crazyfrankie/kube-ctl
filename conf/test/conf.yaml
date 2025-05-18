@@ -1,0 +1,10 @@
+server:
+  addr: :8083
+
+prom:
+  scheme: http
+  host: "172.20.10.97:30090"
+
+storageClass:
+  provisioner:
+    - "cluster.local/nfs-subdir-external-provisioner"
