@@ -289,9 +289,6 @@ func (s *metricsService) GetClusterUsage(ctx context.Context) ([]resp.MetricsIte
 	if err != nil {
 		return metrics, err
 	}
-	//if len(nodes.Items) != len(nodeMetrics.Items) {
-	//	return metrics, nil
-	//}
 
 	pods, err := s.clientSet.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
@@ -302,9 +299,13 @@ func (s *metricsService) GetClusterUsage(ctx context.Context) ([]resp.MetricsIte
 	var memUsage, memTotal int64
 	var podUsage, podTotal int64
 	podUsage = int64(len(pods.Items))
+	count := 0
 	for i, item := range nodes.Items {
-		cpuUsage += nodeMetrics.Items[i].Usage.Cpu().Value()
-		memUsage += nodeMetrics.Items[i].Usage.Memory().Value()
+		if len(nodeMetrics.Items) != count {
+			cpuUsage += nodeMetrics.Items[i].Usage.Cpu().Value()
+			memUsage += nodeMetrics.Items[i].Usage.Memory().Value()
+			count++
+		}
 		cpuTotal += item.Status.Capacity.Cpu().Value()
 		memTotal += item.Status.Capacity.Memory().Value()
 		podTotal += item.Status.Capacity.Pods().Value()
