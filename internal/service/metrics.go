@@ -372,10 +372,12 @@ func (s *metricsService) getMetricsFromProm(metricName string) (string, error) {
 		return "", err
 	}
 
+	beijingLoc, _ := time.LoadLocation("Asia/Shanghai")
 	x := make([]string, 0)
 	y := make([]string, 0)
 	for _, value := range matrix[0].Values {
-		format := value.Timestamp.Time().Format("15:04")
+		beijingTime := value.Timestamp.Time().In(beijingLoc)
+		format := beijingTime.Format("15:04")
 		x = append(x, format)
 		y = append(y, value.Value.String())
 	}
