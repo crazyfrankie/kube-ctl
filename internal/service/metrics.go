@@ -289,9 +289,9 @@ func (s *metricsService) GetClusterUsage(ctx context.Context) ([]resp.MetricsIte
 	if err != nil {
 		return metrics, err
 	}
-	if len(nodes.Items) != len(nodeMetrics.Items) {
-		return metrics, nil
-	}
+	//if len(nodes.Items) != len(nodeMetrics.Items) {
+	//	return metrics, nil
+	//}
 
 	pods, err := s.clientSet.CoreV1().Pods("").List(ctx, metav1.ListOptions{})
 	if err != nil {
